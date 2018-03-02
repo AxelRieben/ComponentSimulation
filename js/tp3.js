@@ -16,7 +16,7 @@ async function running(){
 	context.fillStyle = '#FFFFFF';
 	context.lineWidth = 1;
 	
-	ctx.rect(20,20,150,100);
+	context.rect(20,20,150,100);
 	context.fill();
 	context.stroke();
 	

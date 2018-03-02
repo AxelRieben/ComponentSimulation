@@ -5,7 +5,7 @@
     });
 	var layer = new Konva.Layer();
 	var numberOfArc=8;
-	var counter=0;
+	var counter=1;
 	for(n = 0; n < numberOfArc; n++) {
             addArc(n);
     }
@@ -38,15 +38,14 @@
 		
 		//from : https://konvajs.github.io/docs/sandbox/Wheel_of_Fortune.html
         var text = new Konva.Text({
-            text: "mdrlololol",
+            text: counter,
             fontFamily: 'Calibri',
-            fontSize: 50,
+            fontSize: 50 / counter.toString().length,
             fill: 'white',
             align: 'center',
-            stroke: 'yellow',
+            stroke: 'black',
             strokeWidth: 1
         });
-		counter++;
         text.toImage({
             width: text.getWidth(),
             height: text.getHeight(),
@@ -54,19 +53,20 @@
                 var cachedText = new Konva.Image({
                     image: img,
                     listening: false,
-                    rotation: (Math.PI + angle) / 2,
-                    x: 380,
-                    y: 30
+                    rotation: 115,
+                    x: 120,
+                    y: 35
                 });
-
-                arc.add(cachedText);
+				//cachedText.startRotation = cachedText.getRotation();
+                arcGroupe.add(cachedText);
                 layer.draw();
             }
         });
 
         arcGroupe.startRotation = arcGroupe.getRotation();
-
+		
         layer.add(arcGroupe);
+		counter++;
     }
     // add the layer to the stage
     stage.add(layer);

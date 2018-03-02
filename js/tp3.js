@@ -1,75 +1,72 @@
-//Canavas and context
-let canvas = document.getElementById("canvas");
-let context = canvas.getContext('2d');
-let rect = canvas.getBoundingClientRect();
-
-init();
-rendering();
-
-function init() {
-
+var stage = new Konva.Stage({
+    container: 'container',
+    width: 1200,
+    height: 400
+});
+var layer = new Konva.Layer();
+var numberOfArc = 8;
+var counter = 1;
+for (n = 0; n < numberOfArc; n++) {
+    addArc(n);
 }
 
-async function running() {
-    //clear the context
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.strokeStyle = '#000000';
-    context.fillStyle = '#FFFFFF';
-    context.lineWidth = 1;
 
-    context.rect(20, 20, 150, 100);
-    context.fill();
-    context.stroke();
+/*
+* create a triangle shape by defining a
+* drawing function which draws a triangle
+*/
+function addArc(n) {
+    var angle = 2 * Math.PI / numberOfArc
 
-    context.beginPath();
-    context.arc(200, 200, 80, 0, 2 * Math.PI);
-    context.fill();
-    context.stroke();
+    var arcGroupe = new Konva.Group({
+        x: stage.getWidth() / 2,
+        y: stage.getHeight() / 2,
+        rotation: 115 * n * Math.PI / numberOfArc,
+    });
 
-    context.beginPath();
-    context.moveTo(0, 0);
-    context.lineTo(400, 400);
-    context.closePath();
-    context.stroke();
+    var arc = new Konva.Arc({
+        innerRadius: 40,
+        outerRadius: 150,
+        angle: 360 / numberOfArc,
+        fill: 'yellow',
+        stroke: 'black',
+        strokeWidth: 4
+    });
 
-    context.beginPath();
-    context.moveTo(0, 400);
-    context.lineTo(400, 0);
-    context.closePath();
-    context.stroke();
+    arcGroupe.add(arc);
 
-    context.beginPath();
-    context.moveTo(0, 200);
-    context.lineTo(400, 200);
-    context.closePath();
-    context.stroke();
+    //from : https://konvajs.github.io/docs/sandbox/Wheel_of_Fortune.html
+    var text = new Konva.Text({
+        text: counter,
+        fontFamily: 'Calibri',
+        fontSize: 50 / counter.toString().length,
+        fill: 'white',
+        align: 'center',
+        stroke: 'black',
+        strokeWidth: 1
+    });
+    text.toImage({
+        width: text.getWidth(),
+        height: text.getHeight(),
+        callback: function (img) {
+            var cachedText = new Konva.Image({
+                image: img,
+                listening: false,
+                rotation: 115,
+                x: 120,
+                y: 35
+            });
+            //cachedText.startRotation = cachedText.getRotation();
+            arcGroupe.add(cachedText);
+            layer.draw();
+        }
+    });
 
-    context.beginPath();
-    context.moveTo(200, 0);
-    context.lineTo(200, 400);
-    context.closePath();
-    context.stroke();
+    arcGroupe.startRotation = arcGroupe.getRotation();
 
-    context.beginPath();
-    context.arc(200, 200, 40, 0, 2 * Math.PI);
-    context.fillStyle = '#000000';
-    context.fill();
-    context.stroke();
+    layer.add(arcGroupe);
+    counter++;
 }
 
-// redraw
-function rendering() {
-    requestAnimationFrame(rendering);
-    running();
-}
-
-//calculation if spring length with pythagore
-function springLength(X, Y) {
-    return Math.sqrt(Math.pow(X, 2) + Math.pow(Y, 2))
-}
-
-//update html
-function updateRangeValue(val, field) {
-    document.getElementById(field).value = val;
-    initValues();
-}
+// add the layer to the stage
+stage.add(layer);

@@ -21,14 +21,32 @@ processesArray = [];
 function addProcess(name, arrival, duration) {
     p = new Process(name, arrival, duration);
     processesArray.push(p);
-
-    $('#processes_table_body').append(
-        "<tr>" +
-        "<td>" + p.name + "</td>" +
-        "<td>" + p.arrival + "</td>" +
-        "<td>" + p.duration + "</td>" +
-        "</tr>")
+    updateTableProcess();
 }
+
+
+function resetProcess() {
+    processesArray = [];
+    updateTableProcess();
+}
+
+function updateTableProcess() {
+    let table = $('#processes_table_body');
+    table.empty();
+    processesArray.forEach(p => {
+            table.append(
+                "<tr>" +
+                "<td>" + p.name + "</td>" +
+                "<td>" + p.arrival + "</td>" +
+                "<td>" + p.duration + "</td>" +
+                "</tr>");
+        }
+    );
+}
+
+/***********************************\
+ Events handling
+ \***********************************/
 
 $('#btn_add_process').click(function () {
     let name = "P" + processesArray.length;
@@ -44,11 +62,12 @@ $('#btn_add_process').click(function () {
     if (duration > MAX_DURATION)
         duration = MAX_DURATION;
 
-
     if (duration < MIN_DURATION)
         duration = MIN_DURATION;
 
-    addProcess(name, arrival, duration);
+    if (!isNaN(arrival) && !isNaN(duration)) {
+        addProcess(name, arrival, duration);
+    }
 });
 
 
@@ -58,4 +77,9 @@ $('#btn_add_random').click(function () {
     let duration = Math.floor(Math.random() * MAX_DURATION + MIN_DURATION);
 
     addProcess(name, arrival, duration);
+});
+
+
+$('#btn_reset').click(function () {
+    resetProcess();
 });

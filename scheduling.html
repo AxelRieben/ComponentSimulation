@@ -7,81 +7,101 @@
 </head>
 <body>
 
-<div class="ui container">
-    <h1 class="ui header">Scheduling</h1>
-</div>
+<div class="ui two column centered grid">
 
-<div class="ui container">
-    <h3 class="ui horizontal divider header">
-        <i class="tag icon"></i>
-        Algorithme d'ordonnancement
-    </h3>
+    <div class="column">
+        <div class="ui one column centered grid">
+            <div class="ui column">
+                <h1 class="ui header">Scheduling</h1>
 
-    <select class="ui" id="select_algo" title="algorithm">
-        <option value="fcfs">First-Come, First-Served</option>
-        <option value="sjf_np">Shortest-Job-First Non-Préemptif</option>
-        <option value="sjf_p">Shortest-Job-First Préemptif</option>
-        <option value="rr">Round Robin</option>
-    </select>
-</div>
+                <h3 class="ui horizontal divider header">
+                    <i class="tag icon"></i>
+                    Algorithme d'ordonnancement
+                </h3>
 
-<div class="ui container">
-    <h3 class="ui horizontal divider header">
-        <i class="tag icon"></i>
-        Processus
-    </h3>
+                <select class="ui" id="select_algo" title="algorithm">
+                    <option value="fcfs">First-Come, First-Served</option>
+                    <option value="sjf_np">Shortest-Job-First Non-Préemptif</option>
+                    <option value="sjf_p">Shortest-Job-First Préemptif</option>
+                    <option value="rr">Round Robin</option>
+                </select>
 
-    <p>
-        <label for="in_arrival">Arrivée : </label><input type="number" id="in_arrival" min="0" max="40"/>
-        <label for="in_duration">Durée : </label><input type="number" id="in_duration" min="1" max="15"/>
-        <button class="ui button" id="btn_add_process">Ajouter</button>
-    </p>
+                <h3 class="ui horizontal divider header">
+                    <i class="tag icon"></i>
+                    Processus
+                </h3>
 
-    <p>
-        <button class="ui button" id="btn_add_random">Ajouter un processus aléatoires</button>
-    </p>
+                <div class="ui two column middle aligned grid">
+
+                    <div class="ui column">
+                        <div class="row">
+                            <label for="in_arrival">Arrivée : </label><input type="number" id="in_arrival" min="0"
+                                                                             max="40"/>
+                        </div>
+
+                        <div class="row">
+                            <label for="in_duration">Durée : </label><input type="number" id="in_duration" min="1"
+                                                                            max="15"/>
+                        </div>
+                    </div>
+                    <div class="column">
+
+                        <div class="row">
+                            <button class="ui button" id="btn_add_process">Ajouter</button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="ui two column middle aligned grid">
+                    <div class="column">
+                        <button class="ui button" id="btn_add_random">Ajouter un processus aléatoires</button>
+                    </div>
+                    <div class="column">
+                        <button class="ui button" id="btn_reset">Reset</button>
+                    </div>
+                </div>
 
 
-    <table class="ui definition table" id="processes_table" class="ui celled table">
-        <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Arrivée</th>
-            <th>Durée</th>
-        </tr>
-        </thead>
-        <tbody id="processes_table_body">
-        </tbody>
-    </table>
-</div>
+                <table class="ui definition table" id="processes_table" class="ui celled table">
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Arrivée</th>
+                        <th>Durée</th>
+                    </tr>
+                    </thead>
+                    <tbody id="processes_table_body">
+                    </tbody>
+                </table>
 
-<div class="ui container">
-    <h3 class="ui horizontal divider header">
-        <i class="tag icon"></i>
-        Exécution
-    </h3>
+                <h3 class="ui horizontal divider header">
+                    <i class="tag icon"></i>
+                    Exécution
+                </h3>
 
-    <div class="ui buttons">
-        <button class="ui button" id="btn_manual">Mode manuel</button>
-        <div class="or" data-text="ou"></div>
-        <button class="ui positive button" id="btn_auto">Mode automatique</button>
+                <div class="ui buttons">
+                    <button class="ui button" id="btn_manual">Mode manuel</button>
+                    <div class="or" data-text="ou"></div>
+                    <button class="ui positive button" id="btn_auto">Mode automatique</button>
+                </div>
 
+                <p>
+                    <button class="ui labeled icon button">
+                        <i class="pause icon"></i>
+                        Pause
+                    </button>
+                    <button class="ui right labeled icon button">
+                        <i class="right arrow icon"></i>
+                        Suivant
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="ui column">
+        <p>Execution</p>
     </div>
 </div>
-
-<div class="ui container">
-    <p>
-        <button class="ui labeled icon button">
-            <i class="pause icon"></i>
-            Pause
-        </button>
-        <button class="ui right labeled icon button">
-            <i class="right arrow icon"></i>
-            Suivant
-        </button>
-    </p>
-</div>
-
 
 </body>
 <script src="js/jquery-3.3.1.min.js"></script>

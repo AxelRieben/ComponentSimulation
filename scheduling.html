@@ -4,102 +4,123 @@
     <meta charset="UTF-8">
     <title>Scheduling</title>
     <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
-
-<div class="ui two column centered grid">
-
-    <div class="column">
+<div class="ui centered grid">
+    <div class="sixteen wide column" id="nav">
+        <h1>Scheduling</h1>
+    </div>
+    <div class="six wide column">
         <div class="ui one column centered grid">
-            <div class="ui column">
-                <h1 class="ui header">Scheduling</h1>
+            <div class="row container" id="div_inputs">
+                <div class="ui column">
+                    <h3 class="ui horizontal divider header">
+                        <i class="tag icon"></i>
+                        Algorithme d'ordonnancement
+                    </h3>
 
-                <h3 class="ui horizontal divider header">
-                    <i class="tag icon"></i>
-                    Algorithme d'ordonnancement
-                </h3>
+                    <select class="ui" id="select_algo" title="algorithm">
+                        <option value="fcfs">First-Come, First-Served</option>
+                        <option value="sjf_np">Shortest-Job-First Non-Préemptif</option>
+                        <option value="sjf_p">Shortest-Job-First Préemptif</option>
+                        <option value="rr">Round Robin</option>
+                    </select>
 
-                <select class="ui" id="select_algo" title="algorithm">
-                    <option value="fcfs">First-Come, First-Served</option>
-                    <option value="sjf_np">Shortest-Job-First Non-Préemptif</option>
-                    <option value="sjf_p">Shortest-Job-First Préemptif</option>
-                    <option value="rr">Round Robin</option>
-                </select>
+                    <h3 class="ui horizontal divider header">
+                        <i class="tag icon"></i>
+                        Processus
+                    </h3>
 
-                <h3 class="ui horizontal divider header">
-                    <i class="tag icon"></i>
-                    Processus
-                </h3>
-
-                <div class="ui two column middle aligned grid">
-
-                    <div class="ui column">
-                        <div class="row">
-                            <label for="in_arrival">Arrivée : </label><input type="number" id="in_arrival" min="0"
-                                                                             max="40"/>
+                    <div class="ui centered grid" id="form_process">
+                        <div class="six wide column">
+                            <label for="in_arrival">Arrivée : </label>
+                            <input type="number" id="in_arrival" min="0" max="40"/>
                         </div>
-
-                        <div class="row">
-                            <label for="in_duration">Durée : </label><input type="number" id="in_duration" min="1"
-                                                                            max="15"/>
+                        <div class="six wide column">
+                            <label for="in_duration">Durée : </label>
+                            <input type="number" id="in_duration" min="1" max="15"/>
                         </div>
-                    </div>
-                    <div class="column">
-
-                        <div class="row">
+                        <div class="four wide column" id="div_btn_add_process">
                             <button class="ui button" id="btn_add_process">Ajouter</button>
                         </div>
+
+                    </div>
+                    <div class="ui grid">
+                        <div class="eight wide column">
+                            <button class="ui button" id="btn_add_random">Ajouter un processus aléatoires</button>
+                        </div>
+                        <div class="eight wide column">
+                            <button class="ui button" id="btn_reset">Reset</button>
+                        </div>
                     </div>
 
+
+                    <table class="ui definition celled table" id="processes_table">
+                        <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Arrivée</th>
+                            <th>Durée</th>
+                        </tr>
+                        </thead>
+                        <tbody id="processes_table_body">
+                        </tbody>
+                    </table>
+
                 </div>
-                <div class="ui two column middle aligned grid">
-                    <div class="column">
-                        <button class="ui button" id="btn_add_random">Ajouter un processus aléatoires</button>
+            </div>
+            <div class="row container" id="div_execution">
+                <div class="ui column">
+                    <div>
+                        <h3 class="ui horizontal divider header">
+                            <i class="tag icon"></i>
+                            Exécution
+                        </h3>
+                        <div class="ui centered grid">
+                            <div class="row">
+                                <div class="ui buttons">
+                                    <button class="ui button" id="btn_manual">Mode manuel</button>
+                                    <div class="or" data-text="ou"></div>
+                                    <button class="ui positive button" id="btn_auto">Mode automatique</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <button class="ui labeled icon button">
+                                    <i class="pause icon"></i>
+                                    Pause
+                                </button>
+                                <button id="btn_next" class="ui right labeled icon button disabled" disabled>
+                                    <i class="right arrow icon"></i>
+                                    Suivant
+                                </button>
+                                <button id="btn_stats" class="ui right labeled icon button">
+                                    <i class="chart bar outline icon"></i>
+                                    Statistiques
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="column">
-                        <button class="ui button" id="btn_reset">Reset</button>
-                    </div>
                 </div>
-
-
-                <table class="ui definition table" id="processes_table" class="ui celled table">
-                    <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Arrivée</th>
-                        <th>Durée</th>
-                    </tr>
-                    </thead>
-                    <tbody id="processes_table_body">
-                    </tbody>
-                </table>
-
-                <h3 class="ui horizontal divider header">
-                    <i class="tag icon"></i>
-                    Exécution
-                </h3>
-
-                <div class="ui buttons">
-                    <button class="ui button" id="btn_manual">Mode manuel</button>
-                    <div class="or" data-text="ou"></div>
-                    <button class="ui positive button" id="btn_auto">Mode automatique</button>
-                </div>
-
-                <p>
-                    <button class="ui labeled icon button">
-                        <i class="pause icon"></i>
-                        Pause
-                    </button>
-                    <button class="ui right labeled icon button">
-                        <i class="right arrow icon"></i>
-                        Suivant
-                    </button>
-                </p>
             </div>
         </div>
     </div>
-    <div class="ui column">
-        <p>Execution</p>
+
+
+    <div class="column" id="middle_col"></div>
+    <div class="eight wide column container" id="div_result">
+        <h3 class="ui horizontal divider header">
+            <i class="tag icon"></i>
+            Résultat
+        </h3>
+        <table class="ui definition celled table" id="execution_table">
+            <thead>
+            <tr id="execution_table_head">
+            </tr>
+            </thead>
+            <tbody id="execution_table_body">
+            </tbody>
+        </table>
     </div>
 </div>
 

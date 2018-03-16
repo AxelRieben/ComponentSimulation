@@ -109,14 +109,74 @@ function addRowToExecutionTable() {
 
 function sjf_np(time) {
     console.log("sjf_np");
+    let processRunningArray = processArray.filter(p => p.state === PROCESS_STATES.RUNNING);
+    processRunningArray.push(null);
+    let currentProcessRunning = processRunningArray[0]; //Null if no process is running
+
+    let isAProcessLeaving = false;
+
+    let processReadyArray = processArray.filter(p => p.state === PROCESS_STATES.READY)
+        .sort((p1, p2) => p1.remainingTime - p2.remainingTime);
+
+    processArray.forEach((p) => {
+        if (time >= p.arrival) {
+            if (p.remainingTime > 0) {
+                if (p === currentProcessRunning || p === processReadyArray[0]) {
+
+                    if(p === processReadyArray[0])
+                    {
+                        currentProcessRunning = p;
+                    }
+
+                    if (p.responseTime < 0) // set response time only once
+                    {
+                        p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
+                    }
+
+                    if (p.responseTime < 0) // set response time only once
+                    {
+                        p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
+                    }
+
+                    if (!isAProcessLeaving) {
+                        p.remainingTime--;
+                    }
+
+                    if (p.remainingTime === 0) { // Process leaving
+                        p.state = PROCESS_STATES.LEAVING;
+                        currentProcessRunning = null;
+                        isAProcessLeaving = true;
+                        p.turnAroundTime = time - p.arrival;
+                    }
+                    else {
+                        p.state = PROCESS_STATES.RUNNING;
+                    }
+                }
+                else {
+                    p.waitingTime++;
+                    p.state = PROCESS_STATES.READY;
+                }
+            }
+            else {
+                p.state = PROCESS_STATES.TERMINATED;
+            }
+        }
+        else {
+            p.state = PROCESS_STATES.NOT_ARRIVED;
+        }
+    });
+
 }
 
 function sjf_p(time) {
     console.log("sjf_p");
+
 }
 
 function rr(time) {
     console.log("rr");
+
+
 }
 
 function fcfs(time) {

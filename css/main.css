@@ -50,3 +50,7 @@ input {
     bottom: 10px;
     background: white;
 }
+
+.main_menu {
+    text-align: center;
+}

@@ -1,4 +1,17 @@
-let PROCESS_STATES = {NOT_ARRIVED: -1, READY: 0, WAITING: 1, RUNNING: 2, TERMINATED: 3};
+/**
+ * main.js
+ *
+ * Simulation of process scheduling with FCFS, SJF (P), and RR algorithms
+ *
+ * @license Apache 2.0
+ * @version 0.1
+ * @author  Axel Rieben, Sylvain Renaud
+ * @updated 2018-03-16
+ * @link    https://axelrieben.github.io/ComponentSimulation/index.html
+ *
+ *
+ */
+const PROCESS_STATES = {NOT_ARRIVED: -1, READY: 0, RUNNING: 1, LEAVING: 2, TERMINATED: 3};
 const ALGO = {'fcfs': fcfs, 'sjf_np': sjf_np, 'sjf_p': sjf_p, 'rr': rr};
 const MAX_PROCESS = 10;
 const MAX_ARRIVAL = 40;
@@ -7,6 +20,7 @@ const MIN_ARRIVAL = 0;
 const MIN_DURATION = 1;
 let time = -1;
 let currentAlgo = 'fcfs';
+processArray = [];
 
 class Process {
     constructor(name, arrival, duration) {
@@ -21,21 +35,19 @@ class Process {
     }
 }
 
-processesArray = [];
-
 function addProcess(name, arrival, duration) {
-    if (processesArray.length >= MAX_PROCESS) {
+    if (processArray.length >= MAX_PROCESS) {
         alert("Maximum " + MAX_PROCESS + " process");
     }
     else {
         p = new Process(name, arrival, duration);
-        processesArray.push(p);
+        processArray.push(p);
         updateTableProcess();
     }
 }
 
 function resetProcess() {
-    processesArray = [];
+    processArray = [];
     updateTableProcess();
     updateTableExecutionHeader();
     $('#execution_table_body').empty();
@@ -44,7 +56,7 @@ function resetProcess() {
 function updateTableProcess() {
     let table = $('#processes_table_body');
     table.empty();
-    processesArray.forEach(p => {
+    processArray.forEach(p => {
             table.append(
                 "<tr>" +
                 "<td>" + p.name + "</td>" +
@@ -59,19 +71,39 @@ function updateTableExecutionHeader() {
     let table = $('#execution_table_head');
     table.empty();
     table.append("<th>Time</th>");
-    processesArray
+    processArray
         .sort((p1, p2) => p1.arrival - p2.arrival)
         .forEach(p => table.append("<th>" + p.name + "</th>"));
 }
 
-function addRowExexcutionTable(cellArray) {
+function addRowToExecutionTable() {
     let table = $('#execution_table_body');
     table.append("<tr>");
     table.append("<td>" + time + "</td>");
-    cellArray.forEach(c => {
-        let classTag = c.running ? "positive" : "";
-        table.append("<td class=\"" + classTag + "\">" + c.val + "</td>")
+
+    processArray.forEach(p => {
+        let currentVal = "";
+
+        console.log(p);
+        switch (p.state) {
+            case PROCESS_STATES.NOT_ARRIVED:
+                currentVal = '-';
+                break;
+            case PROCESS_STATES.READY:
+            case PROCESS_STATES.RUNNING:
+            case PROCESS_STATES.LEAVING:
+                currentVal = p.remainingTime;
+                break;
+            case PROCESS_STATES.TERMINATED:
+                currentVal = '';
+                break;
+            default:
+                console.log(p.state);
+        }
+        let classTag = p.state === PROCESS_STATES.RUNNING ? "positive" : "";
+        table.append("<td class=\"" + classTag + "\">" + currentVal + "</td>")
     });
+
     table.append("</tr>");
 }
 
@@ -89,46 +121,55 @@ function rr(time) {
 
 function fcfs(time) {
     console.log("fcfs");
-    let cellArray = [];
     let isAProcessRunning = false;
-    processesArray.forEach((p) => {
-        let val = "";
-        let running = false;
+    let isAProcessLeaving = false;
+
+    processArray.forEach((p) => {
         if (time >= p.arrival) {
-            val = p.remainingTime;
             if (p.remainingTime > 0) {
                 if (!isAProcessRunning) {
                     if (p.responseTime < 0) // set response time only once
+                    {
                         p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
-                    isAProcessRunning = running = true;
-                    p.remainingTime--;
+                    }
+
+                    isAProcessRunning = true;
+
+                    if (!isAProcessLeaving) {
+                        p.remainingTime--;
+                    }
+
+                    if (p.remainingTime === 0) { // Process leaving
+                        p.state = PROCESS_STATES.LEAVING;
+                        isAProcessRunning = false;
+                        isAProcessLeaving = true;
+                        p.turnAroundTime = time - p.arrival;
+                    }
+                    else {
+                        p.state = PROCESS_STATES.RUNNING;
+                    }
                 }
                 else {
-                    running = false;
                     p.waitingTime++;
+                    p.state = PROCESS_STATES.READY;
                 }
             }
-            else if (val === 0) {
-                p.remainingTime--;
-                p.turnAroundTime = time - p.arrival
+            else {
+                p.state = PROCESS_STATES.TERMINATED;
             }
-            else
-                val = "";
         }
         else {
-            val = "-";
+            p.state = PROCESS_STATES.NOT_ARRIVED;
         }
-        cellArray.push({val: val, running: running})
     });
-    return cellArray;
 }
 
 function isFinished() {
-    finished = true;
-    processesArray
-        .map(p => p.remainingTime)
-        .forEach(r => {
-            if (r > -1)
+    let finished = true;
+    processArray
+        .map(p => p.state)
+        .forEach(s => {
+            if (s !== PROCESS_STATES.TERMINATED)
                 finished = false;
         });
     return finished;
@@ -136,8 +177,8 @@ function isFinished() {
 
 function tick() {
     time++;
-    let cellArray = ALGO[currentAlgo](time);
-    addRowExexcutionTable(cellArray);
+    ALGO[currentAlgo](time);
+    addRowToExecutionTable();
 }
 
 function startAnimation(isManual) {
@@ -148,15 +189,14 @@ function startAnimation(isManual) {
         tick();
         if (isFinished()) {
             toggleButtons(false);
-            console.log(processesArray);
+            console.log(processArray);
         }
-
     }
     else {
         while (!isFinished()) {
             tick();
         }
-        console.log(processesArray);
+        console.log(processArray);
         toggleButtons(false);
     }
 }
@@ -184,7 +224,7 @@ function toggleButtons(animation) {
  \***********************************/
 
 $('#btn_add_process').click(function () {
-    let name = "P" + processesArray.length;
+    let name = "P" + processArray.length;
     let arrival = parseInt($('#in_arrival').val());
     let duration = parseInt($('#in_duration').val());
 
@@ -206,7 +246,7 @@ $('#btn_add_process').click(function () {
 });
 
 $('#btn_add_random').click(function () {
-    let name = "P" + processesArray.length;
+    let name = "P" + processArray.length;
     let arrival = Math.floor(Math.random() * MAX_ARRIVAL + MIN_ARRIVAL);
     let duration = Math.floor(Math.random() * MAX_DURATION + MIN_DURATION);
 
@@ -232,7 +272,7 @@ $('#btn_next').click(function () {
     tick();
     if (isFinished()) {
         toggleButtons(false);
-        console.log(processesArray);
+        console.log(processArray);
     }
 });
 
@@ -247,7 +287,7 @@ $('#btn_stats').click(function () {
             stateDivResult = 1;
             let meanW = 0, meanT = 0, meanR = 0, w = "", t = "", r = "";
             divResult.empty();
-            processesArray.forEach(p => {
+            processArray.forEach(p => {
                 meanW += p.waitingTime;
                 meanT += p.turnAroundTime;
                 meanR += p.responseTime;
@@ -255,9 +295,9 @@ $('#btn_stats').click(function () {
                 t += "<li>" + p.name + " : " + p.turnAroundTime + "</li>";
                 r += "<li>" + p.name + " : " + p.responseTime + "</li>";
             });
-            meanW = meanW / processesArray.length;
-            meanT = meanT / processesArray.length;
-            meanR = meanR / processesArray.length;
+            meanW = meanW / processArray.length;
+            meanT = meanT / processArray.length;
+            meanR = meanR / processArray.length;
             divResult.append("<p>Waiting time (Moyenne = " + meanW + ")</p><ul>" + w + "</ul>");
             divResult.append("<p>Turnaroud time (Moyenne = " + meanT + ")</p><ul>" + t + "</ul>");
             divResult.append("<p>Response time (Moyenne = " + meanR + ")</p><ul>" + r + "</ul>");

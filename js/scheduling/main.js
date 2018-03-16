@@ -88,6 +88,7 @@ function rr(time) {
 }
 
 function fcfs(time) {
+    console.log("fcfs");
     let cellArray = [];
     let isAProcessRunning = false;
     processesArray.forEach((p) => {

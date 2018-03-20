@@ -320,6 +320,16 @@ $('#btn_reset').click(function () {
     $('#btn_next').prop('disabled', true);
 });
 
+$('#btn_test_data').click(function () {
+    addProcess("P1", 0, 10);
+    addProcess("P2", 36, 2);
+    addProcess("P3", 3, 6);
+    addProcess("P4", 2, 5);
+    addProcess("P5", 4, 2);
+    addProcess("P6", 10, 2);
+    addProcess("P7", 5, 6);
+});
+
 $('#btn_manual').click(function () {
     startAnimation(true);
 });

@@ -88,7 +88,6 @@ function updateExecutionTable() {
         array.forEach(p => {
             let currentVal = "";
 
-            // console.log(p);
             switch (p.state) {
                 case PROCESS_STATES.NOT_ARRIVED:
                     currentVal = '-';
@@ -96,6 +95,8 @@ function updateExecutionTable() {
                 case PROCESS_STATES.READY:
                 case PROCESS_STATES.RUNNING:
                 case PROCESS_STATES.LEAVING:
+                    currentVal = p.remainingTime;
+                    currentVal = p.remainingTime;
                     currentVal = p.remainingTime;
                     break;
                 case PROCESS_STATES.TERMINATED:
@@ -118,9 +119,7 @@ function sjf_np() {
     let processRunningArray = processArray.filter(p => p.state === PROCESS_STATES.RUNNING);
     processRunningArray.push(null);
     let currentProcessRunning = processRunningArray[0]; //Null if no process is running
-
     let isAProcessLeaving = false;
-
     let processReadyArray = processArray.filter(p => p.state === PROCESS_STATES.READY)
         .sort((p1, p2) => p1.remainingTime - p2.remainingTime);
 
@@ -175,52 +174,34 @@ function sjf_np() {
 
 function sjf_p() {
     console.log("sjf_p");
-
 }
 
 function rr() {
     console.log("rr");
-
-
 }
 
 function fcfs() {
     console.log("using fcfs");
     let isAProcessRunning = false;
-    let isAProcessLeaving = false;
 
     processArray.forEach((p) => {
         if (time >= p.arrival) {
             if (p.remainingTime > 0) {
                 if (!isAProcessRunning) {
-                    if (p.responseTime < 0) // set response time only once
-                    {
-                        p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
-                    }
-
                     isAProcessRunning = true;
-
-                    if (!isAProcessLeaving) {
-                        p.remainingTime--;
-                    }
-
-                    if (p.remainingTime === 0) { // Process leaving
-                        p.state = PROCESS_STATES.LEAVING;
-                        isAProcessRunning = false;
-                        isAProcessLeaving = true;
-                        p.turnAroundTime = time - p.arrival;
-                    }
-                    else {
-                        p.state = PROCESS_STATES.RUNNING;
-                    }
+                    p.state = PROCESS_STATES.RUNNING;
                 }
                 else {
-                    p.waitingTime++;
                     p.state = PROCESS_STATES.READY;
                 }
             }
             else {
-                p.state = PROCESS_STATES.TERMINATED;
+                if (p.remainingTime === 0) {
+                    p.state = PROCESS_STATES.LEAVING;
+                }
+                else {
+                    p.state = PROCESS_STATES.TERMINATED;
+                }
             }
         }
         else {
@@ -242,9 +223,35 @@ function isFinished() {
 
 function tick() {
     time++;
+    //Update process state
     ALGO[currentAlgo]();
     stateHistoryArray[time] = JSON.parse(JSON.stringify(processArray));
-    // updateExecutionTable();
+
+    //Update process values
+    processArray.forEach(p => {
+        switch (p.state) {
+            case PROCESS_STATES.NOT_ARRIVED:
+                break;
+            case PROCESS_STATES.READY:
+                p.waitingTime++;
+                break;
+            case PROCESS_STATES.RUNNING:
+                if (p.responseTime < 0) // set response time only once
+                {
+                    p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
+                }
+                p.remainingTime--;
+                break;
+            case PROCESS_STATES.LEAVING:
+                p.remainingTime--;
+                p.turnAroundTime = time - p.arrival;
+                break;
+            case PROCESS_STATES.TERMINATED:
+                break;
+            default:
+                console.log(p.state);
+        }
+    });
 }
 
 function startAnimation(isManual) {

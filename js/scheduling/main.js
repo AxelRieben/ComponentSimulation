@@ -20,7 +20,8 @@ const MIN_ARRIVAL = 0;
 const MIN_DURATION = 1;
 let time = -1;
 let currentAlgo = 'fcfs';
-processArray = [];
+let processArray = [];
+let stateHistoryArray = [];
 
 class Process {
     constructor(name, arrival, duration) {
@@ -42,18 +43,19 @@ function addProcess(name, arrival, duration) {
     else {
         p = new Process(name, arrival, duration);
         processArray.push(p);
-        updateTableProcess();
+        updateInputTable();
     }
 }
 
 function resetProcess() {
     processArray = [];
-    updateTableProcess();
-    updateTableExecutionHeader();
+    stateHistoryArray = [];
+    updateInputTable();
+    createExecutionTableHeader();
     $('#execution_table_body').empty();
 }
 
-function updateTableProcess() {
+function updateInputTable() {
     let table = $('#processes_table_body');
     table.empty();
     processArray.forEach(p => {
@@ -67,7 +69,7 @@ function updateTableProcess() {
     );
 }
 
-function updateTableExecutionHeader() {
+function createExecutionTableHeader() {
     let table = $('#execution_table_head');
     table.empty();
     table.append("<th>Time</th>");
@@ -76,38 +78,42 @@ function updateTableExecutionHeader() {
         .forEach(p => table.append("<th>" + p.name + "</th>"));
 }
 
-function addRowToExecutionTable() {
+function updateExecutionTable() {
     let table = $('#execution_table_body');
-    table.append("<tr>");
-    table.append("<td>" + time + "</td>");
+    table.empty();
+    stateHistoryArray.forEach((array, index) => {
+        table.append("<tr>");
+        table.append("<td>" + index + "</td>");
 
-    processArray.forEach(p => {
-        let currentVal = "";
+        array.forEach(p => {
+            let currentVal = "";
 
-        console.log(p);
-        switch (p.state) {
-            case PROCESS_STATES.NOT_ARRIVED:
-                currentVal = '-';
-                break;
-            case PROCESS_STATES.READY:
-            case PROCESS_STATES.RUNNING:
-            case PROCESS_STATES.LEAVING:
-                currentVal = p.remainingTime;
-                break;
-            case PROCESS_STATES.TERMINATED:
-                currentVal = '';
-                break;
-            default:
-                console.log(p.state);
-        }
-        let classTag = p.state === PROCESS_STATES.RUNNING ? "positive" : "";
-        table.append("<td class=\"" + classTag + "\">" + currentVal + "</td>")
+            // console.log(p);
+            switch (p.state) {
+                case PROCESS_STATES.NOT_ARRIVED:
+                    currentVal = '-';
+                    break;
+                case PROCESS_STATES.READY:
+                case PROCESS_STATES.RUNNING:
+                case PROCESS_STATES.LEAVING:
+                    currentVal = p.remainingTime;
+                    break;
+                case PROCESS_STATES.TERMINATED:
+                    currentVal = '';
+                    break;
+                default:
+                    console.log(p.state);
+            }
+            let classTag = p.state === PROCESS_STATES.RUNNING ? "positive" : "";
+            table.append("<td class=\"" + classTag + "\">" + currentVal + "</td>")
+        });
+
+        table.append("</tr>");
     });
 
-    table.append("</tr>");
 }
 
-function sjf_np(time) {
+function sjf_np() {
     console.log("sjf_np");
     let processRunningArray = processArray.filter(p => p.state === PROCESS_STATES.RUNNING);
     processRunningArray.push(null);
@@ -123,8 +129,7 @@ function sjf_np(time) {
             if (p.remainingTime > 0) {
                 if (p === currentProcessRunning || p === processReadyArray[0]) {
 
-                    if(p === processReadyArray[0])
-                    {
+                    if (p === processReadyArray[0]) {
                         currentProcessRunning = p;
                     }
 
@@ -168,19 +173,19 @@ function sjf_np(time) {
 
 }
 
-function sjf_p(time) {
+function sjf_p() {
     console.log("sjf_p");
 
 }
 
-function rr(time) {
+function rr() {
     console.log("rr");
 
 
 }
 
-function fcfs(time) {
-    console.log("fcfs");
+function fcfs() {
+    console.log("using fcfs");
     let isAProcessRunning = false;
     let isAProcessLeaving = false;
 
@@ -237,26 +242,28 @@ function isFinished() {
 
 function tick() {
     time++;
-    ALGO[currentAlgo](time);
-    addRowToExecutionTable();
+    ALGO[currentAlgo]();
+    stateHistoryArray[time] = JSON.parse(JSON.stringify(processArray));
+    // updateExecutionTable();
 }
 
 function startAnimation(isManual) {
     toggleButtons(true);
-    updateTableExecutionHeader();
+    createExecutionTableHeader();
     currentAlgo = $('#select_algo').val();
     if (isManual) {
         tick();
         if (isFinished()) {
             toggleButtons(false);
-            console.log(processArray);
+            console.log(stateHistoryArray[stateHistoryArray.length - 1]);
         }
     }
     else {
         while (!isFinished()) {
             tick();
+            updateExecutionTable();
         }
-        console.log(processArray);
+        console.log(stateHistoryArray[stateHistoryArray.length - 1]);
         toggleButtons(false);
     }
 }
@@ -340,6 +347,7 @@ $('#btn_auto').click(function () {
 
 $('#btn_next').click(function () {
     tick();
+    updateExecutionTable();
     if (isFinished()) {
         toggleButtons(false);
         console.log(processArray);
@@ -357,7 +365,7 @@ $('#btn_stats').click(function () {
             stateDivResult = 1;
             let meanW = 0, meanT = 0, meanR = 0, w = "", t = "", r = "";
             divResult.empty();
-            processArray.forEach(p => {
+            stateHistoryArray[stateHistoryArray.length - 1].forEach(p => {
                 meanW += p.waitingTime;
                 meanT += p.turnAroundTime;
                 meanR += p.responseTime;
@@ -365,9 +373,9 @@ $('#btn_stats').click(function () {
                 t += "<li>" + p.name + " : " + p.turnAroundTime + "</li>";
                 r += "<li>" + p.name + " : " + p.responseTime + "</li>";
             });
-            meanW = meanW / processArray.length;
-            meanT = meanT / processArray.length;
-            meanR = meanR / processArray.length;
+            meanW = meanW / stateHistoryArray[stateHistoryArray.length - 1].length;
+            meanT = meanT / stateHistoryArray[stateHistoryArray.length - 1].length;
+            meanR = meanR / stateHistoryArray[stateHistoryArray.length - 1].length;
             divResult.append("<p>Waiting time (Moyenne = " + meanW + ")</p><ul>" + w + "</ul>");
             divResult.append("<p>Turnaroud time (Moyenne = " + meanT + ")</p><ul>" + t + "</ul>");
             divResult.append("<p>Response time (Moyenne = " + meanR + ")</p><ul>" + r + "</ul>");

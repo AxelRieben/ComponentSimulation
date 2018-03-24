@@ -9,7 +9,6 @@
  * @updated 2018-03-16
  * @link    https://axelrieben.github.io/ComponentSimulation/index.html
  *
- *
  */
 const PROCESS_STATES = {NOT_ARRIVED: -1, READY: 0, RUNNING: 1, LEAVING: 2, TERMINATED: 3};
 const ALGO = {'fcfs': fcfs, 'sjf_np': sjf_np, 'sjf_p': sjf_p, 'rr': rr};
@@ -19,10 +18,13 @@ const MAX_DURATION = 15;
 const MIN_ARRIVAL = 0;
 const MIN_DURATION = 1;
 let time = -1;
-let currentAlgo = 'fcfs';
+let currentAlgo = 'fcfs'; // Set default algo to fcfs
 let processArray = [];
 let stateHistoryArray = [];
 
+/**
+ * Representation of a process with some attributes
+ */
 class Process {
     constructor(name, arrival, duration) {
         this.name = name;
@@ -36,6 +38,12 @@ class Process {
     }
 }
 
+/**
+ * Add a process to the process array
+ * @param name
+ * @param arrival
+ * @param duration
+ */
 function addProcess(name, arrival, duration) {
     if (processArray.length >= MAX_PROCESS) {
         alert("Maximum " + MAX_PROCESS + " process");
@@ -47,6 +55,9 @@ function addProcess(name, arrival, duration) {
     }
 }
 
+/**
+ * Reset simulation
+ */
 function resetProcess() {
     processArray = [];
     stateHistoryArray = [];
@@ -55,6 +66,9 @@ function resetProcess() {
     $('#execution_table_body').empty();
 }
 
+/**
+ * Update the input table with the current process array
+ */
 function updateInputTable() {
     let table = $('#processes_table_body');
     table.empty();
@@ -69,6 +83,9 @@ function updateInputTable() {
     );
 }
 
+/**
+ * Create the header of the execution table (with the current process array
+ */
 function createExecutionTableHeader() {
     let table = $('#execution_table_head');
     table.empty();
@@ -78,6 +95,9 @@ function createExecutionTableHeader() {
         .forEach(p => table.append("<th>" + p.name + "</th>"));
 }
 
+/**
+ * Redraw the execution table with the simulation history
+ */
 function updateExecutionTable() {
     let table = $('#execution_table_body');
     table.empty();
@@ -114,6 +134,9 @@ function updateExecutionTable() {
 
 }
 
+/**
+ * Shortest job first non preemptive algorithm
+ */
 function sjf_np() {
     console.log("sjf_np");
     let processRunningArray = processArray.filter(p => p.state === PROCESS_STATES.RUNNING);
@@ -172,14 +195,23 @@ function sjf_np() {
 
 }
 
+/**
+ * Shortest job first preemptive algorithm
+ */
 function sjf_p() {
     console.log("sjf_p");
 }
 
+/**
+ * Round robin algorithm
+ */
 function rr() {
     console.log("rr");
 }
 
+/**
+ * First come first serve algorithm
+ */
 function fcfs() {
     console.log("using fcfs");
     let isAProcessRunning = false;
@@ -210,6 +242,10 @@ function fcfs() {
     });
 }
 
+/**
+ * Check if all process have terminated
+ * @returns {boolean}
+ */
 function isFinished() {
     let finished = true;
     processArray
@@ -221,13 +257,18 @@ function isFinished() {
     return finished;
 }
 
+/**
+ * Call to increment time and process an algo
+ */
 function tick() {
     time++;
-    //Update process state
+    // Update process state using choosed algo
     ALGO[currentAlgo]();
+
+    // Save a deep copy of the curret process array
     stateHistoryArray[time] = JSON.parse(JSON.stringify(processArray));
 
-    //Update process values
+    // Update process values
     processArray.forEach(p => {
         switch (p.state) {
             case PROCESS_STATES.NOT_ARRIVED:
@@ -254,6 +295,10 @@ function tick() {
     });
 }
 
+/**
+ * Entry point of the animation
+ * @param isManual
+ */
 function startAnimation(isManual) {
     toggleButtons(true);
     createExecutionTableHeader();

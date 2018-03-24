@@ -21,10 +21,12 @@ let time = -1;
 let currentAlgo = 'fcfs'; // Set default algo to fcfs
 let processArray = [];
 let stateHistoryArray = [];
+let quantum = 5;
 
 let contentDivResult;
 let stateDivResult = 0;
 
+toggleDivQuantum();
 
 /**
  * Representation of a process with some attributes
@@ -51,12 +53,11 @@ class Process {
 function addProcess(name, arrival, duration) {
     if (processArray.length >= MAX_PROCESS) {
         alert("Maximum " + MAX_PROCESS + " process");
+        return;
     }
-    else {
-        p = new Process(name, arrival, duration);
-        processArray.push(p);
-        updateInputTable();
-    }
+    p = new Process(name, arrival, duration);
+    processArray.push(p);
+    updateInputTable();
 }
 
 /**
@@ -210,7 +211,8 @@ function sjf_p() {
  * Round robin algorithm
  */
 function rr() {
-    console.log("rr");
+    quantum = $('#quantum').val();
+    console.log("using rr with quantum " + quantum);
 }
 
 /**
@@ -347,6 +349,18 @@ function toggleButtons(animation) {
 }
 
 /**
+ * Display quantum input Round Robin algo is selected
+ */
+function toggleDivQuantum() {
+    if ($('#select_algo').val() === "rr") {
+        $('#div_quantum').show();
+    }
+    else {
+        $('#div_quantum').hide();
+    }
+}
+
+/**
  * Display stats about the current execution
  */
 function displayStats() {
@@ -448,9 +462,12 @@ $('#btn_next').click(function () {
     }
 });
 
-
 $('#btn_stats').click(function () {
     if (isFinished()) {
         displayStats();
     }
+});
+
+$('#select_algo').change(() => {
+    toggleDivQuantum();
 });

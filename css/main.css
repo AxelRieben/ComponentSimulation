@@ -54,3 +54,7 @@ input {
 .main_menu {
     text-align: center;
 }
+
+#div_quantum {
+    display: inline-block;
+}

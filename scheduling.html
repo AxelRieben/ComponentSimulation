@@ -26,6 +26,10 @@
                         <option value="sjf_p">Shortest-Job-First Préemptif</option>
                         <option value="rr">Round Robin</option>
                     </select>
+                    <div id="div_quantum">
+                        <label for="quantum">Quantum : </label>
+                        <input type="number" id="quantum" min="1" max="30" value="5"/>
+                    </div>
 
                     <h3 class="ui horizontal divider header">
                         <i class="tag icon"></i>
@@ -131,6 +135,6 @@
 
 </body>
 <script src="js/jquery-3.3.1.min.js"></script>
-<script src="js/scheduling/main.js"></script>
 <script src="semantic/dist/semantic.js"></script>
+<script src="js/scheduling/main.js"></script>
 </html>

@@ -22,6 +22,10 @@ let currentAlgo = 'fcfs'; // Set default algo to fcfs
 let processArray = [];
 let stateHistoryArray = [];
 
+let contentDivResult;
+let stateDivResult = 0;
+
+
 /**
  * Representation of a process with some attributes
  */
@@ -320,6 +324,10 @@ function startAnimation(isManual) {
     }
 }
 
+/**
+ * Toggle the control buttons
+ * @param animation
+ */
 function toggleButtons(animation) {
     btn_next = $('#btn_next');
     btn_manual = $('#btn_manual');
@@ -335,6 +343,40 @@ function toggleButtons(animation) {
         btn_next.addClass('disabled');
         btn_manual.removeClass('disabled');
         btn_auto.removeClass('disabled');
+    }
+}
+
+/**
+ * Display stats about the current execution
+ */
+function displayStats() {
+    let divResult = $('#div_result');
+    if (stateDivResult === 0) {
+        // Save table and replace it by stats
+        contentDivResult = divResult.html();
+        stateDivResult = 1;
+        let meanW = 0, meanT = 0, meanR = 0, w = "", t = "", r = "";
+        divResult.empty();
+        stateHistoryArray[stateHistoryArray.length - 1].forEach(p => {
+            meanW += p.waitingTime;
+            meanT += p.turnAroundTime;
+            meanR += p.responseTime;
+            w += "<li>" + p.name + " : " + p.waitingTime + "</li>";
+            t += "<li>" + p.name + " : " + p.turnAroundTime + "</li>";
+            r += "<li>" + p.name + " : " + p.responseTime + "</li>";
+        });
+        meanW = meanW / stateHistoryArray[stateHistoryArray.length - 1].length;
+        meanT = meanT / stateHistoryArray[stateHistoryArray.length - 1].length;
+        meanR = meanR / stateHistoryArray[stateHistoryArray.length - 1].length;
+        divResult.append("<p>Waiting time (Moyenne = " + meanW + ")</p><ul>" + w + "</ul>");
+        divResult.append("<p>Turnaroud time (Moyenne = " + meanT + ")</p><ul>" + t + "</ul>");
+        divResult.append("<p>Response time (Moyenne = " + meanR + ")</p><ul>" + r + "</ul>");
+    }
+    else {
+        // Hide stats and show backup table
+        stateDivResult = 0;
+        divResult.empty();
+        divResult.html(contentDivResult);
     }
 }
 
@@ -406,37 +448,9 @@ $('#btn_next').click(function () {
     }
 });
 
-let contentDivResult;
-let stateDivResult = 0;
 
 $('#btn_stats').click(function () {
     if (isFinished()) {
-        let divResult = $('#div_result');
-        if (stateDivResult === 0) {
-            contentDivResult = divResult.html();
-            stateDivResult = 1;
-            let meanW = 0, meanT = 0, meanR = 0, w = "", t = "", r = "";
-            divResult.empty();
-            stateHistoryArray[stateHistoryArray.length - 1].forEach(p => {
-                meanW += p.waitingTime;
-                meanT += p.turnAroundTime;
-                meanR += p.responseTime;
-                w += "<li>" + p.name + " : " + p.waitingTime + "</li>";
-                t += "<li>" + p.name + " : " + p.turnAroundTime + "</li>";
-                r += "<li>" + p.name + " : " + p.responseTime + "</li>";
-            });
-            meanW = meanW / stateHistoryArray[stateHistoryArray.length - 1].length;
-            meanT = meanT / stateHistoryArray[stateHistoryArray.length - 1].length;
-            meanR = meanR / stateHistoryArray[stateHistoryArray.length - 1].length;
-            divResult.append("<p>Waiting time (Moyenne = " + meanW + ")</p><ul>" + w + "</ul>");
-            divResult.append("<p>Turnaroud time (Moyenne = " + meanT + ")</p><ul>" + t + "</ul>");
-            divResult.append("<p>Response time (Moyenne = " + meanR + ")</p><ul>" + r + "</ul>");
-        }
-        else {
-            stateDivResult = 0;
-            divResult.empty();
-            divResult.html(contentDivResult);
-        }
+        displayStats();
     }
-
 });

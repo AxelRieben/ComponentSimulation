@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Simulation d'interblocage, des mutex et des sémaphores</title>
+    <meta charset="UTF-8">
+    <style>
+        canvas {border :1px black solid;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;}
+    </style>
+</head>
+<body>
+<div id="head" style="text-align:center; border-bottom: solid 2px black;">
+    <h1>Simulation de composants OS</h1>
+    <h2>Simulation du problème d'interblocage</h2>
+</div>
+<input type="button" id="start" value="START" onclick="callCars();">
+<input type="button" id="stop" value="STOP" onclick="stopCars();">
+<div id="container"></div>
+
+<footer style="margin-top:100px; border-top:2px solid black; ">
+    <h4>Contextualisation</h4>
+    Simulations réalisées durant le cours de conceptions OS par Axel Rieben , Pedro Emmanuel Da Cruz Costa, Syslvain Renaud et Killian Castella
+</footer>
+</body>
+<script src="js/konva.min.js"></script>
+<script src="js/interblocage/car.js"></script>
+<script src="js/interblocage/interblocage.js"></script>
+</html>

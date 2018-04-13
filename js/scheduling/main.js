@@ -23,9 +23,6 @@ let processArray = [];
 let stateHistoryArray = [];
 let quantum = 5;
 
-let contentDivResult;
-let stateDivResult = 0;
-
 toggleDivQuantum();
 
 /**
@@ -94,10 +91,10 @@ function updateInputTable() {
 function createExecutionTableHeader() {
     let table = $('#execution_table_head');
     table.empty();
-    table.append("<th>Time</th>");
+    table.append('<th class="center aligned">Time</th>');
     processArray
         .sort((p1, p2) => p1.arrival - p2.arrival)
-        .forEach(p => table.append("<th>" + p.name + "</th>"));
+        .forEach(p => table.append('<th class="center aligned">' + p.name + '</th>'));
 }
 
 /**
@@ -108,7 +105,7 @@ function updateExecutionTable() {
     table.empty();
     stateHistoryArray.forEach((array, index) => {
         table.append("<tr>");
-        table.append("<td>" + index + "</td>");
+        table.append('<td class="center aligned">' + index + '</td>');
 
         array.forEach(p => {
             let currentVal = "";
@@ -130,8 +127,19 @@ function updateExecutionTable() {
                 default:
                     console.log(p.state);
             }
-            let classTag = p.state === PROCESS_STATES.RUNNING ? "positive" : "";
-            table.append("<td class=\"" + classTag + "\">" + currentVal + "</td>")
+            if (p.state === PROCESS_STATES.RUNNING) {
+                let cell = '<td class="positive center aligned running">';
+                cell += '<b>';
+                cell += currentVal;
+                cell += '</b>';
+                cell += ' <i class="hand point left outline icon"></i>';
+                cell += '</td>';
+                table.append(cell);
+                //table.append('<td class="positive"><b>' + currentVal + '</b><i class="hand point left outline icon"></i></td>');
+            }
+            else {
+                table.append('<td class="center aligned">' + currentVal + '</td>');
+            }
         });
 
         table.append("</tr>");
@@ -213,6 +221,19 @@ function sjf_p() {
 function rr() {
     quantum = $('#quantum').val();
     console.log("using rr with quantum " + quantum);
+    processArray.forEach(p => {
+        if (time >= p.arrival) {
+            if (p.remainingTime > 0) {
+
+            }
+            else {
+
+            }
+        }
+        else {
+            p.state = PROCESS_STATES.NOT_ARRIVED;
+        }
+    });
 }
 
 /**
@@ -361,42 +382,73 @@ function toggleDivQuantum() {
 }
 
 /**
- * Display stats about the current execution
+ * Display stats about the current execution in the div with the given id.
  */
-function displayStats() {
-    let divResult = $('#div_result');
-    if (stateDivResult === 0) {
-        // Save table and replace it by stats
-        contentDivResult = divResult.html();
-        stateDivResult = 1;
-        let meanW = 0, meanT = 0, meanR = 0, w = "", t = "", r = "";
-        divResult.empty();
-        stateHistoryArray[stateHistoryArray.length - 1].forEach(p => {
-            meanW += p.waitingTime;
-            meanT += p.turnAroundTime;
-            meanR += p.responseTime;
-            w += "<li>" + p.name + " : " + p.waitingTime + "</li>";
-            t += "<li>" + p.name + " : " + p.turnAroundTime + "</li>";
-            r += "<li>" + p.name + " : " + p.responseTime + "</li>";
-        });
-        meanW = meanW / stateHistoryArray[stateHistoryArray.length - 1].length;
-        meanT = meanT / stateHistoryArray[stateHistoryArray.length - 1].length;
-        meanR = meanR / stateHistoryArray[stateHistoryArray.length - 1].length;
-        divResult.append("<p>Waiting time (Moyenne = " + meanW + ")</p><ul>" + w + "</ul>");
-        divResult.append("<p>Turnaroud time (Moyenne = " + meanT + ")</p><ul>" + t + "</ul>");
-        divResult.append("<p>Response time (Moyenne = " + meanR + ")</p><ul>" + r + "</ul>");
-    }
-    else {
-        // Hide stats and show backup table
-        stateDivResult = 0;
-        divResult.empty();
-        divResult.html(contentDivResult);
-    }
+function getStatsDiv() {
+    let statsDiv = '';
+    let meanW = 0, meanT = 0, meanR = 0, w = "", t = "", r = "";
+    stateHistoryArray[stateHistoryArray.length - 1].forEach(p => {
+        meanW += p.waitingTime;
+        meanT += p.turnAroundTime;
+        meanR += p.responseTime;
+        w += "<li>" + p.name + " : " + p.waitingTime + "</li>";
+        t += "<li>" + p.name + " : " + p.turnAroundTime + "</li>";
+        r += "<li>" + p.name + " : " + p.responseTime + "</li>";
+    });
+
+    meanW = meanW / stateHistoryArray[stateHistoryArray.length - 1].length;
+    meanT = meanT / stateHistoryArray[stateHistoryArray.length - 1].length;
+    meanR = meanR / stateHistoryArray[stateHistoryArray.length - 1].length;
+
+    statsDiv += "<p><strong>Waiting time</strong> (Moyenne = " + meanW.toFixed(2) + ")</p><ul>" + w + "</ul>";
+    statsDiv += "<p><strong>Turnaroud time</strong> (Moyenne = " + meanT.toFixed(2) + ")</p><ul>" + t + "</ul>";
+    statsDiv += "<p><strong>Response time</strong> (Moyenne = " + meanR.toFixed(2) + ")</p><ul>" + r + "</ul>";
+
+    return statsDiv;
 }
 
 /***********************************\
  Events handling
  \***********************************/
+
+/**
+ * Print an element
+ * Credits : https://stackoverflow.com/questions/2255291/print-the-contents-of-a-div
+ */
+function print() {
+    let mywindow = window.open('', 'PRINT', 'height=800,width=1000');
+
+    mywindow.document.write('<html><head><title>' + document.title + '</title>');
+    //mywindow.document.write('<link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">');
+    mywindow.document.write('<link rel="stylesheet" type="text/css" href="css/print.css">');
+    mywindow.document.write('</head><body><div class="container">');
+
+    // Gantt
+    mywindow.document.write('<div id="gantt"><h3>Gantt diagram</h3>');
+    mywindow.document.write('<table id="execution_table">');
+    mywindow.document.write(document.getElementById('execution_table').innerHTML);
+    mywindow.document.write('</table></div>');
+
+    // Temporal distribution
+    mywindow.document.write('<div id="temp_distribution"><h3>Temporal distribution</h3>');
+    mywindow.document.write('<table id="processes_table">');
+    mywindow.document.write(document.getElementById('processes_table').innerHTML);
+    mywindow.document.write('</table></div>');
+
+    // Stats
+    mywindow.document.write('<div id="stats"><h3>Statistics</h3>');
+    mywindow.document.write('<div>');
+    mywindow.document.write(getStatsDiv());
+    mywindow.document.write('</div>');
+    mywindow.document.write('</div>');
+
+    mywindow.document.write('</div>');
+    mywindow.document.write('<script type="text/javascript">onload = () => {/*window.print(); window.close();*/}</script>');
+    mywindow.document.write('</body></html>');
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
+    return true;
+}
 
 $('#btn_add_process').click(function () {
     let name = "P" + processArray.length;
@@ -433,6 +485,7 @@ $('#btn_reset').click(function () {
     time = -1;
     $('#btn_manual').prop('disabled', false);
     $('#btn_next').prop('disabled', true);
+    document.getElementById('div_result').hidden = true;
 });
 
 $('#btn_test_data').click(function () {
@@ -446,10 +499,12 @@ $('#btn_test_data').click(function () {
 });
 
 $('#btn_manual').click(function () {
+    document.getElementById('div_result').hidden = false;
     startAnimation(true);
 });
 
 $('#btn_auto').click(function () {
+    document.getElementById('div_result').hidden = false;
     startAnimation(false);
 });
 
@@ -464,7 +519,11 @@ $('#btn_next').click(function () {
 
 $('#btn_stats').click(function () {
     if (isFinished()) {
-        displayStats();
+        let div_stats = document.getElementById('div_stats');
+        if (div_stats.hidden) {
+            document.getElementById('div_stats_content').innerHTML = getStatsDiv();
+        }
+        div_stats.hidden = !div_stats.hidden;
     }
 });
 

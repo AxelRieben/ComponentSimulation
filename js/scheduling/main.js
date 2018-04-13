@@ -143,6 +143,7 @@ function updateExecutionTable() {
  */
 function sjf_np() {
     console.log("sjf_np");
+
     let processRunningArray = processArray.filter(p => p.state === PROCESS_STATES.RUNNING);
     processRunningArray.push(null);
     let currentProcessRunning = processRunningArray[0]; //Null if no process is running
@@ -159,13 +160,13 @@ function sjf_np() {
                         currentProcessRunning = p;
                     }
 
-                    if (p.responseTime < 0) // set response time only once
-                    {
+                    // set response time only once
+                    if (p.responseTime < 0) {
                         p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
                     }
 
-                    if (p.responseTime < 0) // set response time only once
-                    {
+                    // set response time only once
+                    if (p.responseTime < 0) {
                         p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
                     }
 
@@ -173,7 +174,8 @@ function sjf_np() {
                         p.remainingTime--;
                     }
 
-                    if (p.remainingTime === 0) { // Process leaving
+                    // Process leaving
+                    if (p.remainingTime === 0) {
                         p.state = PROCESS_STATES.LEAVING;
                         currentProcessRunning = null;
                         isAProcessLeaving = true;
@@ -204,6 +206,36 @@ function sjf_np() {
  */
 function sjf_p() {
     console.log("sjf_p");
+
+    //Set state for all processes, except the RUNNING state
+    processArray.forEach((p) => {
+        if (time >= p.arrival) {
+            if (p.remainingTime > 0) {
+                p.state = PROCESS_STATES.READY;
+            }
+            else {
+                if (p.remainingTime === 0) {
+                    p.state = PROCESS_STATES.LEAVING;
+                }
+                else {
+                    p.state = PROCESS_STATES.TERMINATED;
+                }
+            }
+        }
+        else {
+            p.state = PROCESS_STATES.NOT_ARRIVED;
+        }
+    });
+
+    //Retrive the process with the shortest remaining time
+    let processRunning = processArray
+        .filter(p => p.state === PROCESS_STATES.READY || p.state === PROCESS_STATES.RUNNING)
+        .sort((p1, p2) => p1.remainingTime - p2.remainingTime)[0];
+
+    //Set the running process
+    if (processRunning !== undefined) {
+        processRunning.state = PROCESS_STATES.RUNNING;
+    }
 }
 
 /**

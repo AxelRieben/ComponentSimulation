@@ -6,71 +6,82 @@
     <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
-<body>
+<body onload="init()">
+<div class="" id="nav">
+    <h1>Scheduling</h1>
+</div>
 <div class="ui centered grid">
-    <div class="sixteen wide column" id="nav">
-        <h1>Scheduling</h1>
-    </div>
     <div class="six wide column">
         <div class="ui one column centered grid">
             <div class="row bordered_container" id="div_inputs">
                 <div class="ui column">
                     <h3 class="ui horizontal divider header">
-                        <i class="tag icon"></i>
-                        Algorithme d'ordonnancement
+                        <i class="code icon"></i>
+                        Scheduling algorithm
                     </h3>
-
-                    <select class="ui" id="select_algo" title="algorithm">
-                        <option value="fcfs">First-Come, First-Served</option>
-                        <option value="sjf_np">Shortest-Job-First Non-Préemptif</option>
-                        <option value="sjf_p">Shortest-Job-First Préemptif</option>
-                        <option value="rr">Round Robin</option>
-                    </select>
-                    <div id="div_quantum">
-                        <label for="quantum">Quantum : </label>
-                        <input type="number" id="quantum" min="1" max="30" value="5"/>
+                    <div class="field">
+                        <select class="ui fluid dropdown" id="select_algo" title="algorithm">
+                            <option value="fcfs">First-Come, First-Served</option>
+                            <option value="sjf_np">Shortest-Job-First Non-Préemptif</option>
+                            <option value="sjf_p">Shortest-Job-First Préemptif</option>
+                            <option value="rr">Round Robin</option>
+                        </select>
                     </div>
-                    <button onclick="print()">print</button>
+                    <div class="field">
+                        <div id="div_quantum" class="ui input width100"
+                             data-tooltip="Quantum parameter for Round Robin algorithm"
+                             data-position="bottom center">
+                            <input class="ui input width100" type="number" id="quantum" min="1" max="30" value="5"/>
+                        </div>
+                    </div>
                     <h3 class="ui horizontal divider header">
                         <i class="tag icon"></i>
-                        Processus
+                        Process
                     </h3>
 
                     <div class="ui centered grid" id="form_process">
                         <div class="six wide column">
-                            <label for="in_arrival">Arrivée : </label>
-                            <input type="number" id="in_arrival" min="0" max="40"/>
+                            <div class="ui input width100" data-tooltip="Arriving time" data-position="top center">
+                                <input class="ui input width100" type="number" id="in_arrival" min="0" max="40"
+                                       placeholder="Arriving time"/>
+                            </div>
                         </div>
                         <div class="six wide column">
-                            <label for="in_duration">Durée : </label>
-                            <input type="number" id="in_duration" min="1" max="15"/>
+                            <div class="ui input width100" data-tooltip="Duration" data-position="top center">
+                                <input class="width100" type="number" id="in_duration" min="1" max="15"
+                                       placeholder="Duration"/>
+                            </div>
                         </div>
                         <div class="four wide column" id="div_btn_add_process">
-                            <button class="ui button" id="btn_add_process">Ajouter</button>
+                            <button class="ui button width100" id="btn_add_process">Add</button>
                         </div>
 
                     </div>
                     <div class="ui grid">
-                        <div class="eight wide column">
-                            <button class="ui button" id="btn_add_random">Ajouter un processus aléatoires</button>
+                        <div class="row">
+                            <div class="eight wide column">
+                                <button class="ui button width100" id="btn_add_random">Add random process</button>
+                            </div>
+                            <div class="eight wide column">
+                                <button class="ui button width100" id="btn_reset">Reset</button>
+                            </div>
                         </div>
-                        <div class="eight wide column">
-                            <button class="ui button" id="btn_reset">Reset</button>
-
-
-                        </div>
-                        <div class="sixteen wide column">
-                            <button class="ui button" id="btn_test_data">Load test data</button>
+                        <div class="row">
+                            <div class="eight wide column">
+                                <button class="ui button width100" id="btn_test_data">Load test data</button>
+                            </div>
+                            <div class="eight wide column">
+                                <button class="ui button width100" onclick="print()">Print</button>
+                            </div>
                         </div>
                     </div>
 
-
-                    <table class="ui definition celled table" id="processes_table">
+                    <table class="ui celled table" id="processes_table">
                         <thead>
                         <tr>
-                            <th>Nom</th>
-                            <th>Arrivée</th>
-                            <th>Durée</th>
+                            <th class="center aligned">Name</th>
+                            <th class="center aligned">Arriving time</th>
+                            <th class="center aligned">Duration</th>
                         </tr>
                         </thead>
                         <tbody id="processes_table_body">
@@ -79,38 +90,32 @@
 
                 </div>
             </div>
-            <div class="row bordered_container" id="div_execution">
-                <div class="ui column">
-                    <div>
-                        <h3 class="ui horizontal divider header">
-                            <i class="tag icon"></i>
-                            Exécution
-                        </h3>
-                        <div class="ui centered grid">
-                            <div class="row">
-                                <div class="ui buttons">
-                                    <button class="ui button" id="btn_manual">Mode manuel</button>
-                                    <div class="or" data-text="ou"></div>
-                                    <button class="ui positive button" id="btn_auto">Mode automatique</button>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <button class="ui labeled icon button">
-                                    <i class="pause icon"></i>
-                                    Pause
-                                </button>
-                                <button id="btn_next" class="ui right labeled icon button disabled" disabled>
-                                    <i class="right arrow icon"></i>
-                                    Suivant
-                                </button>
-                                <button id="btn_stats" class="ui right labeled icon button">
-                                    <i class="chart bar outline icon"></i>
-                                    Statistiques
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+
+        </div>
+    </div>
+
+    <div class="bordered_container" id="div_execution">
+        <h3 class="ui horizontal divider header">
+            <i class="play icon"></i>
+            Execution
+        </h3>
+        <div class="ui centered grid">
+            <div class="row">
+                <div class="ui buttons">
+                    <button class="ui button" id="btn_manual">Manual</button>
+                    <div class="or" data-text="or"></div>
+                    <button class="ui positive button" id="btn_auto">Automatic</button>
                 </div>
+            </div>
+            <div class="row">
+                <button id="btn_next" class="ui right labeled icon button disabled" disabled>
+                    <i class="right arrow icon"></i>
+                    Next
+                </button>
+                <button id="btn_stats" class="ui right labeled icon button">
+                    <i class="chart bar outline icon"></i>
+                    Statistics
+                </button>
             </div>
         </div>
     </div>
@@ -119,8 +124,8 @@
     <div class="eight wide column">
         <div class="bordered_container" id="div_stats" hidden>
             <h3 class="ui horizontal divider header">
-                <i class="tag icon"></i>
-                Statistiques
+                <i class="chart bar outline icon"></i>
+                Statistics
             </h3>
             <div id="div_stats_content">
 
@@ -129,13 +134,12 @@
 
         <div class="bordered_container" id="div_result" hidden>
             <h3 class="ui horizontal divider header">
-                <i class="tag icon"></i>
-                Résultat
+                <i class="calendar alternate icon"></i>
+                Results
             </h3>
-            <table class="ui definition celled table" id="execution_table">
+            <table class="ui celled definition table" id="execution_table">
                 <thead>
-                <tr id="execution_table_head">
-                </tr>
+                <tr id="execution_table_head"></tr>
                 </thead>
                 <tbody id="execution_table_body">
                 </tbody>
@@ -144,8 +148,15 @@
     </div>
 </div>
 
+<footer class="container">
+    <div id="foot">
+        <p>By Axel Rieben & Sylvain Renaud - 2018 - OS Conception</p>
+    </div>
+</footer>
+
 </body>
 <script src="js/jquery-3.3.1.min.js"></script>
-<script src="semantic/dist/semantic.js"></script>
+<script src="semantic/dist/semantic.min.js"></script>
+<script src="semantic/dist/components/dropdown.min.js"></script>
 <script src="js/scheduling/main.js"></script>
 </html>

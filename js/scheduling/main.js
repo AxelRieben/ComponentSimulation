@@ -64,7 +64,6 @@ function resetProcess() {
     processArray = [];
     stateHistoryArray = [];
     updateInputTable();
-    createExecutionTableHeader();
     $('#execution_table_body').empty();
 }
 
@@ -77,9 +76,9 @@ function updateInputTable() {
     processArray.forEach(p => {
             table.append(
                 "<tr>" +
-                "<td>" + p.name + "</td>" +
-                "<td>" + p.arrival + "</td>" +
-                "<td>" + p.duration + "</td>" +
+                "<td class=\"center aligned\">" + p.name + "</td>" +
+                "<td class=\"center aligned\">" + p.arrival + "</td>" +
+                "<td class=\"center aligned\">" + p.duration + "</td>" +
                 "</tr>");
         }
     );
@@ -101,12 +100,12 @@ function createExecutionTableHeader() {
  * Redraw the execution table with the simulation history
  */
 function updateExecutionTable() {
-    let table = $('#execution_table_body');
-    table.empty();
+    let table = document.getElementById('execution_table_body');
+    table.innerHTML = '';
+    let html = '';
     stateHistoryArray.forEach((array, index) => {
-        table.append("<tr>");
-        table.append('<td class="center aligned">' + index + '</td>');
-
+        html += "<tr>";
+        html += '<td class="center aligned">' + index + '</td>';
         array.forEach(p => {
             let currentVal = "";
 
@@ -117,8 +116,6 @@ function updateExecutionTable() {
                 case PROCESS_STATES.READY:
                 case PROCESS_STATES.RUNNING:
                 case PROCESS_STATES.LEAVING:
-                    currentVal = p.remainingTime;
-                    currentVal = p.remainingTime;
                     currentVal = p.remainingTime;
                     break;
                 case PROCESS_STATES.TERMINATED:
@@ -132,19 +129,17 @@ function updateExecutionTable() {
                 cell += '<b>';
                 cell += currentVal;
                 cell += '</b>';
-                cell += ' <i class="hand point left outline icon"></i>';
+                /*cell += ' <i class="hand point left outline icon"></i>';*/
                 cell += '</td>';
-                table.append(cell);
-                //table.append('<td class="positive"><b>' + currentVal + '</b><i class="hand point left outline icon"></i></td>');
+                html += cell;
             }
             else {
-                table.append('<td class="center aligned">' + currentVal + '</td>');
+                html += '<td class="center aligned">' + currentVal + '</td>';
             }
         });
-
-        table.append("</tr>");
+        html += "</tr>";
     });
-
+    table.innerHTML = html;
 }
 
 /**
@@ -372,10 +367,10 @@ function startAnimation(isManual) {
     else {
         while (!isFinished()) {
             tick();
-            updateExecutionTable();
         }
         console.log(stateHistoryArray[stateHistoryArray.length - 1]);
         toggleButtons(false);
+        updateExecutionTable();
     }
 }
 
@@ -419,10 +414,24 @@ function toggleDivQuantum() {
 function getStatsDiv() {
     let statsDiv = '';
     let meanW = 0, meanT = 0, meanR = 0, w = "", t = "", r = "";
+    let lines = '';
+
+    statsDiv += `<table class="ui definition celled table"><thead><tr class="center aligned">
+<th></th>
+<th>Waiting time</th>
+<th>Turn around time</th>
+<th>Response time</th>
+</tr></thead><tbody>`;
+
+    function addLine(name, wt, tt, rt) {
+        return '<tr class="center aligned"><td>' + name + '</td><td>' + wt + '</td><td>' + tt + '</td><td>' + rt + '</td></tr>';
+    }
+
     stateHistoryArray[stateHistoryArray.length - 1].forEach(p => {
         meanW += p.waitingTime;
         meanT += p.turnAroundTime;
         meanR += p.responseTime;
+        statsDiv += addLine(p.name, p.waitingTime, p.turnAroundTime, p.responseTime);
         w += "<li>" + p.name + " : " + p.waitingTime + "</li>";
         t += "<li>" + p.name + " : " + p.turnAroundTime + "</li>";
         r += "<li>" + p.name + " : " + p.responseTime + "</li>";
@@ -431,11 +440,18 @@ function getStatsDiv() {
     meanW = meanW / stateHistoryArray[stateHistoryArray.length - 1].length;
     meanT = meanT / stateHistoryArray[stateHistoryArray.length - 1].length;
     meanR = meanR / stateHistoryArray[stateHistoryArray.length - 1].length;
-
+    /*
     statsDiv += "<p><strong>Waiting time</strong> (Moyenne = " + meanW.toFixed(2) + ")</p><ul>" + w + "</ul>";
     statsDiv += "<p><strong>Turnaroud time</strong> (Moyenne = " + meanT.toFixed(2) + ")</p><ul>" + t + "</ul>";
     statsDiv += "<p><strong>Response time</strong> (Moyenne = " + meanR.toFixed(2) + ")</p><ul>" + r + "</ul>";
+    */
 
+    statsDiv += '<tr class="center aligned"><td>' + 'Mean' + '</td><td><strong>'
+        + meanW.toFixed(2) + '</strong></td><td><strong>'
+        + meanT.toFixed(2) + '</strong></td><td><strong>'
+        + meanR.toFixed(2) + '</strong></td></tr>';
+
+    statsDiv += '</tbody></table>';
     return statsDiv;
 }
 
@@ -444,25 +460,18 @@ function getStatsDiv() {
  \***********************************/
 
 /**
- * Print an element
+ * Print Temporal distribution, Stats and Gantt diagram
  * Credits : https://stackoverflow.com/questions/2255291/print-the-contents-of-a-div
  */
 function print() {
-    let mywindow = window.open('', 'PRINT', 'height=800,width=1000');
+    let mywindow = window.open('', 'Print', 'height=600,width=800');
 
     mywindow.document.write('<html><head><title>' + document.title + '</title>');
-    //mywindow.document.write('<link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">');
     mywindow.document.write('<link rel="stylesheet" type="text/css" href="css/print.css">');
     mywindow.document.write('</head><body><div class="container">');
 
-    // Gantt
-    mywindow.document.write('<div id="gantt"><h3>Gantt diagram</h3>');
-    mywindow.document.write('<table id="execution_table">');
-    mywindow.document.write(document.getElementById('execution_table').innerHTML);
-    mywindow.document.write('</table></div>');
-
     // Temporal distribution
-    mywindow.document.write('<div id="temp_distribution"><h3>Temporal distribution</h3>');
+    mywindow.document.write('<div id="input_stats"><div id="temp_distribution"><h3>Temporal distribution</h3>');
     mywindow.document.write('<table id="processes_table">');
     mywindow.document.write(document.getElementById('processes_table').innerHTML);
     mywindow.document.write('</table></div>');
@@ -472,10 +481,16 @@ function print() {
     mywindow.document.write('<div>');
     mywindow.document.write(getStatsDiv());
     mywindow.document.write('</div>');
-    mywindow.document.write('</div>');
+    mywindow.document.write('</div></div>');
+
+    // Gantt
+    mywindow.document.write('<div id="gantt"><h3>Gantt diagram</h3>');
+    mywindow.document.write('<table id="execution_table">');
+    mywindow.document.write(document.getElementById('execution_table').innerHTML);
+    mywindow.document.write('</table></div>');
 
     mywindow.document.write('</div>');
-    mywindow.document.write('<script type="text/javascript">onload = () => {/*window.print(); window.close();*/}</script>');
+    mywindow.document.write('<script type="text/javascript">onload = () => {window.print(); window.close();}</script>');
     mywindow.document.write('</body></html>');
     mywindow.document.close(); // necessary for IE >= 10
     mywindow.focus(); // necessary for IE >= 10*/
@@ -508,26 +523,26 @@ $('#btn_add_random').click(function () {
     let name = "P" + processArray.length;
     let arrival = Math.floor(Math.random() * MAX_ARRIVAL + MIN_ARRIVAL);
     let duration = Math.floor(Math.random() * MAX_DURATION + MIN_DURATION);
-
     addProcess(name, arrival, duration);
 });
 
 $('#btn_reset').click(function () {
     resetProcess();
     time = -1;
-    $('#btn_manual').prop('disabled', false);
-    $('#btn_next').prop('disabled', true);
     document.getElementById('div_result').hidden = true;
+    document.getElementById('div_stats').hidden = true;
+    document.getElementById('div_stats_content').innerHTML = '';
+    toggleButtons(false);
 });
 
 $('#btn_test_data').click(function () {
-    addProcess("P1", 0, 10);
-    addProcess("P2", 36, 2);
-    addProcess("P3", 3, 6);
-    addProcess("P4", 2, 5);
-    addProcess("P5", 4, 2);
-    addProcess("P6", 10, 2);
-    addProcess("P7", 5, 6);
+    addProcess("P" + processArray.length, 0, 10);
+    addProcess("P" + processArray.length, 36, 2);
+    addProcess("P" + processArray.length, 3, 6);
+    addProcess("P" + processArray.length, 2, 5);
+    addProcess("P" + processArray.length, 4, 2);
+    addProcess("P" + processArray.length, 10, 2);
+    addProcess("P" + processArray.length, 5, 6);
 });
 
 $('#btn_manual').click(function () {
@@ -536,6 +551,8 @@ $('#btn_manual').click(function () {
 });
 
 $('#btn_auto').click(function () {
+    stateHistoryArray = [];
+    $('#execution_table_body').empty();
     document.getElementById('div_result').hidden = false;
     startAnimation(false);
 });
@@ -547,6 +564,7 @@ $('#btn_next').click(function () {
         toggleButtons(false);
         console.log(processArray);
     }
+    window.scrollTo(0, document.body.scrollHeight);
 });
 
 $('#btn_stats').click(function () {
@@ -562,3 +580,9 @@ $('#btn_stats').click(function () {
 $('#select_algo').change(() => {
     toggleDivQuantum();
 });
+
+function init() {
+    $('.ui.dropdown')
+        .dropdown()
+    ;
+}

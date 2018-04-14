@@ -1,6 +1,7 @@
 /*@media print {*/
 body {
-    -webkit-print-color-adjust: exact;
+    -webkit-print-color-adjust: exact; /*Chrome and Safari*/
+    color-adjust: exact; /*Firefox*/
 }
 
 table {
@@ -16,7 +17,7 @@ table, th, td {
 }
 
 .running {
-    background-color: lightgray;
+    background-color: #e6e6e6;
 }
 
 .container {
@@ -32,13 +33,12 @@ table, th, td {
 
 #gantt {
     grid-column: 3 / 3;
-    grid-row: 1 / 3;
     /*border: 1px solid green;*/
 }
 
 #stats {
+    margin-top: 3em;
     grid-column: 1 / 2;
-    grid-row: 2 / 2;
 }
 
 /*}*/

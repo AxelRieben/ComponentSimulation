@@ -12,9 +12,20 @@ body {
 #nav {
     color: white;
     background-color: black;
-    margin-bottom: 1em;
+    margin-bottom: 3em;
     text-align: center;
     padding: 0;
+}
+
+#foot {
+    color: white;
+    background-color: black;
+    text-align: center;
+    padding: 0.4em;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 input {
@@ -27,7 +38,10 @@ input {
 
 }
 
-#btn_reset, #btn_add_random {
+/*#btn_reset, #btn_add_random {
+    width: 100%;
+}*/
+.width100 {
     width: 100%;
 }
 
@@ -37,19 +51,17 @@ input {
     margin: 0;
 }
 
-/*
-#div_execution,  {
-    margin-bottom: 10px;
-}*/
 #div_inputs {
-    margin-bottom: 200px;
+    margin-bottom: 240px;
 }
 
 #div_execution {
     position: fixed;
-    left: 10px;
-    bottom: 10px;
+    left: 30px;
+    width: 25em;
+    bottom: 40px;
     background: white;
+    padding: 15px 20px 15px 20px;
 }
 
 .main_menu {
@@ -57,5 +69,14 @@ input {
 }
 
 #div_quantum {
-    display: inline-block;
+    margin-top: 0.8em;
+}
+
+body {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#div_result {
+    margin-bottom: 3em;
 }

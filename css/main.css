@@ -45,6 +45,10 @@ input {
     width: 100%;
 }
 
+#right_side {
+    padding-top: 0;
+}
+
 #middle_col {
     width: 2em;
     padding: 0;

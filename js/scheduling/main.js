@@ -148,54 +148,24 @@ function updateExecutionTable() {
 function sjf_np() {
     console.log("sjf_np");
 
-    let processRunningArray = processArray.filter(p => p.state === PROCESS_STATES.RUNNING);
-    processRunningArray.push(null);
-    let currentProcessRunning = processRunningArray[0]; //Null if no process is running
-    let isAProcessLeaving = false;
-    let processReadyArray = processArray.filter(p => p.state === PROCESS_STATES.READY)
-        .sort((p1, p2) => p1.remainingTime - p2.remainingTime);
+    //Retrieve the current running process
+    let processRunning = processArray.filter(p => p.state === PROCESS_STATES.RUNNING)[0];
 
+    //Set state for all processes, except the RUNNING state
     processArray.forEach((p) => {
         if (time >= p.arrival) {
             if (p.remainingTime > 0) {
-                if (p === currentProcessRunning || p === processReadyArray[0]) {
-
-                    if (p === processReadyArray[0]) {
-                        currentProcessRunning = p;
-                    }
-
-                    // set response time only once
-                    if (p.responseTime < 0) {
-                        p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
-                    }
-
-                    // set response time only once
-                    if (p.responseTime < 0) {
-                        p.responseTime = time - p.arrival; // in FCFS waiting time and response time are equal
-                    }
-
-                    if (!isAProcessLeaving) {
-                        p.remainingTime--;
-                    }
-
-                    // Process leaving
-                    if (p.remainingTime === 0) {
-                        p.state = PROCESS_STATES.LEAVING;
-                        currentProcessRunning = null;
-                        isAProcessLeaving = true;
-                        p.turnAroundTime = time - p.arrival;
-                    }
-                    else {
-                        p.state = PROCESS_STATES.RUNNING;
-                    }
-                }
-                else {
-                    p.waitingTime++;
+                if (p !== processRunning) {
                     p.state = PROCESS_STATES.READY;
                 }
             }
             else {
-                p.state = PROCESS_STATES.TERMINATED;
+                if (p.remainingTime === 0) {
+                    p.state = PROCESS_STATES.LEAVING;
+                }
+                else {
+                    p.state = PROCESS_STATES.TERMINATED;
+                }
             }
         }
         else {
@@ -203,6 +173,19 @@ function sjf_np() {
         }
     });
 
+    //Retrieve the current running process
+    processRunning = processArray.filter(p => p.state === PROCESS_STATES.RUNNING)[0];
+
+    if (processRunning === undefined) {
+        //Retrive the process with the shortest remaining time
+        let sjProcess = processArray
+            .filter(p => p.state === PROCESS_STATES.READY || p.state === PROCESS_STATES.RUNNING)
+            .sort((p1, p2) => p1.remainingTime - p2.remainingTime)[0];
+
+        if (sjProcess !== undefined) {
+            sjProcess.state = PROCESS_STATES.RUNNING;
+        }
+    }
 }
 
 /**
@@ -232,13 +215,13 @@ function sjf_p() {
     });
 
     //Retrive the process with the shortest remaining time
-    let processRunning = processArray
+    let sjProcess = processArray
         .filter(p => p.state === PROCESS_STATES.READY || p.state === PROCESS_STATES.RUNNING)
         .sort((p1, p2) => p1.remainingTime - p2.remainingTime)[0];
 
     //Set the running process
-    if (processRunning !== undefined) {
-        processRunning.state = PROCESS_STATES.RUNNING;
+    if (sjProcess !== undefined) {
+        sjProcess.state = PROCESS_STATES.RUNNING;
     }
 }
 

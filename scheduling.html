@@ -7,8 +7,17 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body onload="init()">
-<div class="" id="nav">
-    <h1>Scheduling</h1>
+<div class="ui grid" id="nav">
+    <div class="six wide column">
+        <h1>Components simulation</h1>
+    </div>
+    <div class="ten wide column">
+        <div class="ui three item inverted menu">
+            <a class="item active" href="scheduling.html">Scheduling</a>
+            <a class="item" href="interblocage.html">Deadlock</a>
+            <a class="item" href="producteur_consommateur.html">Producer - Consumer</a>
+        </div>
+    </div>
 </div>
 <div class="ui centered grid">
     <div class="six wide column">
@@ -28,10 +37,10 @@
                         </select>
                     </div>
                     <div class="field">
-                        <div id="div_quantum" class="ui input width100"
+                        <div id="div_quantum" class="ui input fluid"
                              data-tooltip="Quantum parameter for Round Robin algorithm"
                              data-position="bottom center">
-                            <input class="ui input width100" type="number" id="quantum" min="1" max="30" value="5"/>
+                            <input class="ui input " type="number" id="quantum" min="1" max="30" value="5"/>
                         </div>
                     </div>
                     <h3 class="ui horizontal divider header">

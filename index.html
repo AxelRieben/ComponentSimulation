@@ -7,19 +7,46 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
-<div class="ui centered grid">
-    <div class="sixteen wide column" id="nav">
-        <h1>Simulations de composants</h1>
+<div class="ui grid" id="nav">
+    <div class="six wide column">
+        <h1>Components simulation</h1>
     </div>
-    <div class="four wide column">
-        <div class="ui list main_menu">
-            <a class="item" href="scheduling.html"><h2>Scheduling</h2></a>
-            <a class="item" href="multithreading.html"><h2>Multithreading</h2></a>
+    <div class="ten wide column">
+        <div class="ui three item inverted menu">
+            <a class="item" href="scheduling.html">Scheduling</a>
+            <a class="item" href="interblocage.html">Deadlock</a>
+            <a class="item" href="producteur_consommateur.html">Producer - Consumer</a>
+        </div>
+    </div>
+</div>
+<div class="ui centered grid">
+    <div class="row">
+        <div class="eight wide column center aligned">
+            <a class="ui button width100" href="scheduling.html"><h2>Scheduling</h2></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="eight wide column center aligned">
+            <a class="ui button width100" href="interblocage.html"><h2>Deadlock - Mutex & Semaphores</h2></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="eight wide column center aligned">
+            <a class="ui button width100" href="producteur_consommateur.html"><h2>Producer - Consumer</h2></a>
         </div>
     </div>
 </div>
 
+<footer class="container">
+    <div id="foot">
+        <p>By Axel Rieben, Sylvain Renaud, Pedro Costa & Killian Castella - 2018 - OS Conception</p>
+    </div>
+</footer>
+
 </body>
 <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
 <script type="text/javascript" src="semantic/dist/semantic.min.js"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="semantic/dist/semantic.min.js"></script>
+<script src="semantic/dist/components/dropdown.min.js"></script>
 </html>

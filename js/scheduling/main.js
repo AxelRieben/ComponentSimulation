@@ -10,6 +10,7 @@
  * @link    https://axelrieben.github.io/ComponentSimulation/index.html
  *
  */
+
 const PROCESS_STATES = {NOT_ARRIVED: -1, READY: 0, RUNNING: 1, LEAVING: 2, TERMINATED: 3};
 const ALGO = {'fcfs': fcfs, 'sjf_np': sjf_np, 'sjf_p': sjf_p, 'rr': rr};
 const MAX_PROCESS = 10;
@@ -563,9 +564,3 @@ $('#btn_stats').click(function () {
 $('#select_algo').change(() => {
     toggleDivQuantum();
 });
-
-function init() {
-    $('.ui.dropdown')
-        .dropdown()
-    ;
-}

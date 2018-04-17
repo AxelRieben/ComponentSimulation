@@ -1,0 +1,85 @@
+body {
+    background-color: white;
+}
+
+.bordered_container {
+    padding: 2em;
+    margin-bottom: 1em;
+    border: 2px solid darkgrey;
+    border-radius: 10px
+}
+
+#nav {
+    color: white;
+    background-color: black;
+    margin: 0 0 2em;
+    padding: 0;
+}
+
+#foot {
+    color: white;
+    background-color: black;
+    text-align: center;
+    padding: 0.4em;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+input {
+    width: 4em;
+    text-align: center;
+}
+
+#div_btn_add_process {
+    text-align: center;
+
+}
+
+/*#btn_reset, #btn_add_random {
+    width: 100%;
+}*/
+.width100 {
+    width: 100%;
+}
+
+#right_side {
+    padding-top: 0;
+}
+
+#middle_col {
+    width: 2em;
+    padding: 0;
+    margin: 0;
+}
+
+#div_inputs {
+    margin-bottom: 240px;
+}
+
+#div_execution {
+    position: fixed;
+    left: 30px;
+    width: 25em;
+    bottom: 40px;
+    background: white;
+    padding: 15px 20px 15px 20px;
+}
+
+.main_menu {
+    text-align: center;
+}
+
+#div_quantum {
+    margin-top: 0.8em;
+}
+
+body {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#div_result {
+    margin-bottom: 3em;
+}

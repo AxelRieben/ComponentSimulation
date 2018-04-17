@@ -1,30 +1,48 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <title>Simulation de Producteur/Consommateur</title>
-        <meta charset="UTF-8">
-		<style>
-			canvas {border :1px black solid;
-			padding-left: 0;
-			padding-right: 0;
-			margin-left: auto;
-			margin-right: auto;
-			display: block;}	
-		</style>	
-    </head>
-    <body>
-        <div id="head" style="text-align:center; border-bottom: solid 2px black;">
-            <h1>Simulation de composants OS</h1>
-            <h2>Simulation du problème Producteur/Consommateur</h2>
+<head>
+    <title>Simulation de Producteur/Consommateur</title>
+    <meta charset="UTF-8">
+    <style>
+        canvas {
+            border: 1px black solid;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+<div class="ui grid" id="nav">
+    <div class="six wide column">
+        <a style="color: white;" href="index.html"><h1>Components simulation</h1></a>
+    </div>
+    <div class="ten wide column">
+        <div class="ui four item inverted menu">
+            <a class="item" href="scheduling.html">Scheduling</a>
+            <a class="item" href="prediction.html">Prediction</a>
+            <a class="item" href="interblocage.html">Deadlock</a>
+            <a class="item active" href="producteur_consommateur.html">Producer - Consumer</a>
         </div>
-		<div id="container"></div>
+    </div>
+</div>
 
-		<footer style="margin-top:100px; border-top:2px solid black; ">
-            <h4>Contextualisation</h4>
-            Simulations réalisée durant le cours de conceptions OS par Axel Rieben , Pedro Emmanuel Da Cruz Costa, Syslvain Renaud et Killian Castella
-        </footer>
-    </body>
-	<script src="js/konva.min.js"></script>
-	<script src="js/producteur_consommateur.js"></script>
-	
+<div id="container"></div>
+
+<footer style="margin-top:100px; border-top:2px solid black; ">
+    <h4>Contextualisation</h4>
+    Simulations réalisée durant le cours de conceptions OS par Axel Rieben , Pedro Emmanuel Da Cruz Costa, Sylvain
+    Renaud et Killian Castella
+</footer>
+</body>
+<script src="js/konva.min.js"></script>
+<script src="js/producteur_consommateur.js"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="semantic/dist/semantic.min.js"></script>
+<script src="semantic/dist/components/dropdown.min.js"></script>
+
 </html>

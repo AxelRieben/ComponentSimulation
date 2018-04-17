@@ -36,11 +36,24 @@ class Car{
 
     haveIntersection(car) {
         return !(
-            car.rect.getX() > this.rect.getX() + this.width ||
-            car.rect.getX() + car.width < this.rect.getX() ||
-            car.rect.getY() > this.rect.getY() + this.height ||
-            car.rect.getY() + car.height < this.rect.getY()
+            this.rect.getX() > car.rect.getX() + car.width ||
+            this.rect.getX() + this.width < car.rect.getX() ||
+            this.rect.getY() > car.rect.getY() + car.height ||
+            this.rect.getY() + this.height < car.rect.getY()
         );
+    }
+
+    collision(){
+        self = this;
+        listCar.forEach(function(car){
+            if (self === car){
+                return;
+            }
+            if(self.haveIntersection(car)){
+                self.stopAnimation();
+                car.stopAnimation();
+            }
+        });
     }
 
     setAnimation(){
@@ -67,6 +80,7 @@ class CarLeft extends Car{
 
         this.animation = new Konva.Animation(function(frame){
             self.rect.setX(parseInt(self.limitBegin + self.dx * frame.time));
+            self.collision();
         }, layer);
     }
 
@@ -85,6 +99,7 @@ class CarTop extends Car{
         
         this.animation = new Konva.Animation(function(frame) {
             self.rect.setY(self.limitBegin + self.dx * frame.time);
+            self.collision();
         }, layer);
     }
 
@@ -103,6 +118,7 @@ class CarRight extends Car{
 
         this.animation = new Konva.Animation(function(frame) {
             self.rect.setX(self.limitBegin + self.dx * frame.time);
+            self.collision();
         }, layer);
     }
 
@@ -121,6 +137,7 @@ class CarBottom extends Car{
 
         this.animation = new Konva.Animation(function(frame) {
             self.rect.setY(self.limitBegin + self.dx * frame.time);
+            self.collision();
         }, layer);
     }
 

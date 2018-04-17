@@ -82,15 +82,8 @@ function startTimer(){
                 listCar[i].rect.destroy();
                 delete listCar[i];
                 listCar.splice(i,1);
-            }else{
-                for (let j = 0; j < listCar.length; j++){
-                    if (listCar[i].haveIntersection(listCar[j])){
-                        console.log("BOOM");
-                    }
-                }
             }
         }
-
     }, 1000);
 }
 

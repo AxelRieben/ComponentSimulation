@@ -593,7 +593,7 @@ $('#btn_next').click(function () {
         toggleButtons(false);
         console.log(processArray);
     }
-    window.scrollTo(0, document.body.scrollHeight);
+    // window.scrollTo(0, document.body.scrollHeight); // Scroll to bottom, need optimization
 });
 
 $('#btn_stats').click(function () {

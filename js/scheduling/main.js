@@ -237,7 +237,7 @@ function rr() {
     processArray.forEach(p => {
         if (time >= p.arrival) {
             if (p.remainingTime > 0) {
-                if(p.state !== PROCESS_STATES.RUNNING) {
+                if (p.state !== PROCESS_STATES.RUNNING) {
                     p.state = PROCESS_STATES.READY;
                 }
             }
@@ -277,13 +277,11 @@ function rr() {
                     let nextRunningProcess = runningProcess;
                     let i = 0;
 
-                    while(nextRunningProcess === runningProcess && i < potentialProcesses.length)
-                    {
+                    while (nextRunningProcess === runningProcess && i < potentialProcesses.length) {
                         nextRunningProcess = potentialProcesses[i];
                         i++;
                         console.log("Next");
                     }
-
                     nextRunningProcess.state = PROCESS_STATES.RUNNING;
                 }
             }
@@ -292,7 +290,6 @@ function rr() {
             potentialProcesses[0].state = PROCESS_STATES.RUNNING;
         }
     }
-
 }
 
 /**

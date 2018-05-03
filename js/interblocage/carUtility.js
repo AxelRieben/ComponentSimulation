@@ -186,9 +186,6 @@ function manageLightsTraffic(){
 
 function toggleMode(){
     trafficLightsOn = !trafficLightsOn;
-    if (trafficLightsOn){
-        manageLightsTraffic();
-    }
 }
 
 function startTimer(){
@@ -197,6 +194,12 @@ function startTimer(){
     startTopTimer();
     startRightTimer();
     startBottomTimer();
+
+    if(trafficLightsOn){
+        manageLightsTraffic();
+    }
+
+    $('#toggle_input').attr('disabled','disabled');
 
     //Main timer
     timer = setInterval(function(){

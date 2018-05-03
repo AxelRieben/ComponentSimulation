@@ -26,6 +26,7 @@ function callCars(){
 
 function stopCars() {
     if (isStarted === true){
+        $("#toggle_input").removeAttr('disabled');
         listCar.forEach(function(car) {
             car.stopAnimation();
             car.rect.destroy();

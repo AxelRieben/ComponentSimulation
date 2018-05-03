@@ -9,6 +9,11 @@ body {
     border-radius: 10px
 }
 
+.formula{
+    text-align: center;
+    font-size: 2em;
+}
+
 #nav {
     color: white;
     background-color: black;

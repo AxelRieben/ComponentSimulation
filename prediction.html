@@ -5,6 +5,12 @@
     <title>Pediction</title>
     <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" async
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/x-mathjax-config">
+         MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
 </head>
 <body>
 <div class="ui grid" id="nav">
@@ -27,33 +33,49 @@
             <div class="row bordered_container">
                 <div class="ui column">
                     <h3 class="ui horizontal divider header">
-                        <i class="bolt icon"></i>
+                        <i class="calculator icon"></i>
                         Prediction calculator
                     </h3>
-                    <div class="field">
-                        <div id="div_quantum" class="ui input fluid"
-                             data-tooltip="Quantum parameter for Round Robin algorithm"
-                             data-position="bottom center">
-                            <input class="ui input " type="number" id="quantum" min="1" max="30" value="5"/>
-                        </div>
-                    </div>
-
-
-                    <div class="ui grid">
+                    <div class="ui one column grid" style="margin: 0.5em;">
                         <div class="row">
+                            <p class="formula width100">
+                                $$\tau_{n+1} = \alpha \cdot t_n + (1 - \alpha) \cdot \tau_n$$
+                            </p>
+                        </div>
 
-                            <div class="sixteen wide column">
+                        <div class="row">
+                            <div class="ui form width100">
+                                <div class="fields">
+                                    <div id="div_alpha" class="field width100"
+                                         data-tooltip="0 ≤ α ≤ 1">
+                                        <label>$$\alpha$$</label>
+                                        <input type="number" placeholder="α" min="0" max="1" id="alpha"/>
+                                    </div>
+                                    <div id="div_tau" class="field width100" data-tooltip="Previous prediction">
+                                        <label>$$\tau_n$$</label>
+                                        <input type="number" placeholder="Tau" id="tau"/>
+                                    </div>
+                                    <div id="div_tn" class="field width100"
+                                         data-tooltip="Actual burst size">
+                                        <label>$$t_n$$</label>
+                                        <input type="number" placeholder="tn" id="tn"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="width100">
                                 <button class="ui button width100" id="btn_calculate">Calculate</button>
                             </div>
+                        </div>
+                        <div class="row centered ui center aligned big green label" id="result">
 
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-
 </div>
 
 <footer class="container">

@@ -38,6 +38,7 @@ class Process {
         this.responseTime = -1;
         this.waitingTime = 0;
         this.turnAroundTime = 0;
+        this.roundRobinCycle = 0;
         this.state = PROCESS_STATES.NOT_ARRIVED;
     }
 }
@@ -232,19 +233,63 @@ function sjf_p() {
 function rr() {
     quantum = $('#quantum').val();
     console.log("using rr with quantum " + quantum);
+
     processArray.forEach(p => {
         if (time >= p.arrival) {
             if (p.remainingTime > 0) {
-
+                if (p.state !== PROCESS_STATES.RUNNING) {
+                    p.state = PROCESS_STATES.READY;
+                }
             }
             else {
-
+                if (p.remainingTime === 0) {
+                    p.state = PROCESS_STATES.LEAVING;
+                }
+                else {
+                    p.state = PROCESS_STATES.TERMINATED;
+                }
             }
         }
         else {
             p.state = PROCESS_STATES.NOT_ARRIVED;
         }
     });
+
+    let runningProcess = processArray.filter(p => p.state === PROCESS_STATES.RUNNING)[0];
+    let potentialProcesses = processArray
+        .filter(p => p.state === PROCESS_STATES.READY || p.state === PROCESS_STATES.RUNNING)
+        .sort((p1, p2) => p1.roundRobinCycle - p2.roundRobinCycle);
+
+    //Set the running process
+    if (potentialProcesses.length !== 0) {
+        if (potentialProcesses.length > 1) {
+            if (runningProcess !== undefined) {
+                const elapsedTime = runningProcess.duration - runningProcess.remainingTime;
+                if (elapsedTime % quantum !== 0 || elapsedTime === 0) {
+                    runningProcess.state = PROCESS_STATES.RUNNING;
+                    console.log("Run");
+                }
+                else {
+                    console.log("Ready");
+                    runningProcess.state = PROCESS_STATES.READY;
+                    runningProcess.roundRobinCycle++;
+
+                    let nextRunningProcess = runningProcess;
+                    let i = 0;
+
+                    while (nextRunningProcess === runningProcess && i < potentialProcesses.length) {
+                        nextRunningProcess = potentialProcesses[i];
+                        i++;
+                        console.log("Next");
+                    }
+                    nextRunningProcess.state = PROCESS_STATES.RUNNING;
+                }
+            }
+        }
+        else {
+            potentialProcesses[0].state = PROCESS_STATES.RUNNING;
+        }
+    }
 }
 
 /**
@@ -548,7 +593,7 @@ $('#btn_next').click(function () {
         toggleButtons(false);
         console.log(processArray);
     }
-    window.scrollTo(0, document.body.scrollHeight);
+    // window.scrollTo(0, document.body.scrollHeight); // Scroll to bottom, need optimization
 });
 
 $('#btn_stats').click(function () {

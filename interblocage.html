@@ -15,6 +15,7 @@
     </style>
     <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/toggle_button.css">
 </head>
 <body>
 
@@ -35,18 +36,33 @@
 <button class="ui button" type="button" id="start" value="START" onclick="callCars();">START</button>
 <button class="ui button" type="button" id="stop" value="STOP" onclick="stopCars();">STOP</button>
 
+<div id="toggle">
+    <h4>Traffic lights
+    <label class="switch">
+        <input type="checkbox" onclick="toggleMode();">
+        <span class="slider round"></span>
+    </label></h4>
+    <span><p id="trafficStatusLeftRight"></p></span>
+    <span><p id="trafficStatusTopBottom"></p></span>
+</div>
+
 <div id="container"></div>
 
-<footer style="margin-top:100px; border-top:2px solid black; ">
-    <h4>Contextualisation</h4>
-    Simulations réalisées durant le cours de conceptions OS par Axel Rieben , Pedro Emmanuel Da Cruz Costa, Syslvain
-    Renaud et Killian Castella
+<footer class="container">
+    <div id="foot">
+        <p>By Pedro Costa - 2018 - OS Conception</p>
+    </div>
 </footer>
+
 </body>
+
 <script src="js/konva.min.js"></script>
 <script src="js/interblocage/car.js"></script>
+<script src="js/interblocage/carUtility.js"></script>
+<script src="js/interblocage/roads.js"></script>
 <script src="js/interblocage/interblocage.js"></script>
 <script src="js/jquery-3.3.1.min.js"></script>
 <script src="semantic/dist/semantic.min.js"></script>
 <script src="semantic/dist/components/dropdown.min.js"></script>
+
 </html>

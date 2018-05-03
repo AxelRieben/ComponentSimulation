@@ -1,17 +1,23 @@
-/*
- * # Semantic - Modal
+/*!
+ * # Semantic UI 2.3.1 - Modal
  * http://github.com/semantic-org/semantic-ui/
  *
  *
- * Copyright 2014 Contributor
  * Released under the MIT license
  * http://opensource.org/licenses/MIT
  *
  */
 
-;(function ( $, window, document, undefined ) {
+;(function ($, window, document, undefined) {
 
-"use strict";
+'use strict';
+
+window = (typeof window != 'undefined' && window.Math == Math)
+  ? window
+  : (typeof self != 'undefined' && self.Math == Math)
+    ? self
+    : Function('return this')()
+;
 
 $.fn.modal = function(parameters) {
   var
@@ -53,9 +59,9 @@ $.fn.modal = function(parameters) {
         eventNamespace  = '.' + namespace,
         moduleNamespace = 'module-' + namespace,
 
-        $module      = $(this),
-        $context     = $(settings.context),
-        $close       = $module.find(selector.close),
+        $module         = $(this),
+        $context        = $(settings.context),
+        $close          = $module.find(selector.close),
 
         $allModals,
         $otherModals,
@@ -63,8 +69,13 @@ $.fn.modal = function(parameters) {
         $dimmable,
         $dimmer,
 
-        element      = this,
-        instance     = $module.data(moduleNamespace),
+        element         = this,
+        instance        = $module.data(moduleNamespace),
+
+        ignoreRepeatedEvents = false,
+
+        elementEventNamespace,
+        id,
         observer,
         module
       ;
@@ -73,35 +84,14 @@ $.fn.modal = function(parameters) {
         initialize: function() {
           module.verbose('Initializing dimmer', $context);
 
-          if($.fn.dimmer === undefined) {
-            module.error(error.dimmer);
-            return;
-          }
+          module.create.id();
+          module.create.dimmer();
+          module.refreshModals();
 
-          $dimmable = $context
-            .dimmer({
-              debug      : settings.debug,
-              dimmerName : 'modals',
-              closable   : false,
-              useCSS     : true,
-              duration   : {
-                show     : settings.duration * 0.9,
-                hide     : settings.duration * 1.1
-              }
-            })
-          ;
-          if(settings.detachable) {
-            $dimmable.dimmer('add content', $module);
-          }
-
-          $dimmer = $dimmable.dimmer('get dimmer');
-          $otherModals = $module.siblings(selector.modal);
-          $allModals   = $otherModals.add($module);
-
-          module.verbose('Attaching close events', $close);
           module.bind.events();
-          module.observeChanges();
-
+          if(settings.observeChanges) {
+            module.observeChanges();
+          }
           module.instantiate();
         },
 
@@ -113,12 +103,49 @@ $.fn.modal = function(parameters) {
           ;
         },
 
+        create: {
+          dimmer: function() {
+            var
+              defaultSettings = {
+                debug      : settings.debug,
+                variation  : settings.centered
+                  ? false
+                  : 'top aligned'
+                ,
+                dimmerName : 'modals'
+              },
+              dimmerSettings = $.extend(true, defaultSettings, settings.dimmerSettings)
+            ;
+            if($.fn.dimmer === undefined) {
+              module.error(error.dimmer);
+              return;
+            }
+            module.debug('Creating dimmer');
+            $dimmable = $context.dimmer(dimmerSettings);
+            if(settings.detachable) {
+              module.verbose('Modal is detachable, moving content into dimmer');
+              $dimmable.dimmer('add content', $module);
+            }
+            else {
+              module.set.undetached();
+            }
+            $dimmer = $dimmable.dimmer('get dimmer');
+          },
+          id: function() {
+            id = (Math.random().toString(16) + '000000000').substr(2,8);
+            elementEventNamespace = '.' + id;
+            module.verbose('Creating unique id for element', id);
+          }
+        },
+
         destroy: function() {
           module.verbose('Destroying previous modal');
           $module
             .removeData(moduleNamespace)
             .off(eventNamespace)
           ;
+          $window.off(elementEventNamespace);
+          $dimmer.off(elementEventNamespace);
           $close.off(eventNamespace);
           $context.dimmer('destroy');
         },
@@ -142,7 +169,11 @@ $.fn.modal = function(parameters) {
           module.cacheSizes();
           module.set.screenHeight();
           module.set.type();
-          module.set.position();
+        },
+
+        refreshModals: function() {
+          $otherModals = $module.siblings(selector.modal);
+          $allModals   = $otherModals.add($module);
         },
 
         attachEvents: function(selector, event) {
@@ -153,7 +184,7 @@ $.fn.modal = function(parameters) {
             ? module[event]
             : module.toggle
           ;
-          if($toggle.size() > 0) {
+          if($toggle.length > 0) {
             module.debug('Attaching modal events to element', selector, event);
             $toggle
               .off(eventNamespace)
@@ -167,48 +198,67 @@ $.fn.modal = function(parameters) {
 
         bind: {
           events: function() {
-            $close
-              .on('click' + eventNamespace, module.event.close)
+            module.verbose('Attaching events');
+            $module
+              .on('click' + eventNamespace, selector.close, module.event.close)
+              .on('click' + eventNamespace, selector.approve, module.event.approve)
+              .on('click' + eventNamespace, selector.deny, module.event.deny)
             ;
             $window
-              .on('resize' + eventNamespace, module.event.resize)
+              .on('resize' + elementEventNamespace, module.event.resize)
             ;
           }
         },
 
+        get: {
+          id: function() {
+            return (Math.random().toString(16) + '000000000').substr(2,8);
+          }
+        },
+
         event: {
+          approve: function() {
+            if(ignoreRepeatedEvents || settings.onApprove.call(element, $(this)) === false) {
+              module.verbose('Approve callback returned false cancelling hide');
+              return;
+            }
+            ignoreRepeatedEvents = true;
+            module.hide(function() {
+              ignoreRepeatedEvents = false;
+            });
+          },
+          deny: function() {
+            if(ignoreRepeatedEvents || settings.onDeny.call(element, $(this)) === false) {
+              module.verbose('Deny callback returned false cancelling hide');
+              return;
+            }
+            ignoreRepeatedEvents = true;
+            module.hide(function() {
+              ignoreRepeatedEvents = false;
+            });
+          },
           close: function() {
-            module.verbose('Closing element pressed');
-            if( $(this).is(selector.approve) ) {
-              if($.proxy(settings.onApprove, element)() !== false) {
-                module.hide();
-              }
-              else {
-                module.verbose('Approve callback returned false cancelling hide');
-              }
-            }
-            else if( $(this).is(selector.deny) ) {
-              if($.proxy(settings.onDeny, element)() !== false) {
-                module.hide();
-              }
-              else {
-                module.verbose('Deny callback returned false cancelling hide');
-              }
-            }
-            else {
-              module.hide();
-            }
+            module.hide();
           },
           click: function(event) {
-            if( $(event.target).closest(selector.modal).size() === 0 ) {
+            if(!settings.closable) {
+              module.verbose('Dimmer clicked but closable setting is disabled');
+              return;
+            }
+            var
+              $target   = $(event.target),
+              isInModal = ($target.closest(selector.modal).length > 0),
+              isInDOM   = $.contains(document.documentElement, event.target)
+            ;
+            if(!isInModal && isInDOM && module.is.active()) {
               module.debug('Dimmer clicked, hiding all modals');
+              module.remove.clickaway();
               if(settings.allowMultiple) {
                 module.hide();
               }
               else {
                 module.hideAll();
               }
-              event.stopImmediatePropagation();
             }
           },
           debounce: function(method, delay) {
@@ -232,7 +282,7 @@ $.fn.modal = function(parameters) {
             }
           },
           resize: function() {
-            if( $dimmable.dimmer('is active') ) {
+            if( $dimmable.dimmer('is active') && ( module.is.animating() || module.is.active() ) ) {
               requestAnimationFrame(module.refresh);
             }
           }
@@ -252,8 +302,18 @@ $.fn.modal = function(parameters) {
             ? callback
             : function(){}
           ;
-          module.showDimmer();
+          module.refreshModals();
+          module.set.dimmerSettings();
           module.showModal(callback);
+        },
+
+        hide: function(callback) {
+          callback = $.isFunction(callback)
+            ? callback
+            : function(){}
+          ;
+          module.refreshModals();
+          module.hideModal(callback);
         },
 
         showModal: function(callback) {
@@ -261,51 +321,48 @@ $.fn.modal = function(parameters) {
             ? callback
             : function(){}
           ;
-          if( !module.is.active() ) {
+          if( module.is.animating() || !module.is.active() ) {
 
-            if( $otherModals.filter(':visible').size() > 0 && !settings.allowMultiple) {
-              module.debug('Other modals visible, queueing show animation');
+            module.showDimmer();
+            module.cacheSizes();
+            module.set.screenHeight();
+            module.set.type();
+            module.set.clickaway();
+
+            if( !settings.allowMultiple && module.others.active() ) {
               module.hideOthers(module.showModal);
             }
             else {
-              $.proxy(settings.onShow, element)();
+              if(settings.allowMultiple && settings.detachable) {
+                $module.detach().appendTo($dimmer);
+              }
+              settings.onShow.call(element);
               if(settings.transition && $.fn.transition !== undefined && $module.transition('is supported')) {
                 module.debug('Showing modal with css animations');
-                module.cacheSizes();
-                module.set.position();
-                module.set.screenHeight();
-                module.set.type();
                 $module
                   .transition({
-                    debug     : settings.debug,
-                    animation : settings.transition + ' in',
-                    queue     : false,
-                    duration  : settings.duration,
-                    onStart   : function() {
-                      module.set.clickaway();
-                    },
+                    debug       : settings.debug,
+                    animation   : settings.transition + ' in',
+                    queue       : settings.queue,
+                    duration    : settings.duration,
+                    useFailSafe : true,
                     onComplete : function() {
-                      $.proxy(settings.onVisible, element)();
-                      module.add.keyboardShortcuts();
+                      settings.onVisible.apply(element);
+                      if(settings.keyboardShortcuts) {
+                        module.add.keyboardShortcuts();
+                      }
                       module.save.focus();
                       module.set.active();
-                      module.set.autofocus();
+                      if(settings.autofocus) {
+                        module.set.autofocus();
+                      }
                       callback();
                     }
                   })
                 ;
               }
               else {
-                module.debug('Showing modal with javascript');
-                $module
-                  .fadeIn(settings.duration, settings.easing, function() {
-                    $.proxy(settings.onVisible, element)();
-                    module.add.keyboardShortcuts();
-                    module.save.focus();
-                    module.set.active();
-                    callback();
-                  })
-                ;
+                module.error(error.noTransition);
               }
             }
           }
@@ -314,8 +371,51 @@ $.fn.modal = function(parameters) {
           }
         },
 
+        hideModal: function(callback, keepDimmed) {
+          callback = $.isFunction(callback)
+            ? callback
+            : function(){}
+          ;
+          module.debug('Hiding modal');
+          if(settings.onHide.call(element, $(this)) === false) {
+            module.verbose('Hide callback returned false cancelling hide');
+            return;
+          }
+
+          if( module.is.animating() || module.is.active() ) {
+            if(settings.transition && $.fn.transition !== undefined && $module.transition('is supported')) {
+              module.remove.active();
+              $module
+                .transition({
+                  debug       : settings.debug,
+                  animation   : settings.transition + ' out',
+                  queue       : settings.queue,
+                  duration    : settings.duration,
+                  useFailSafe : true,
+                  onStart     : function() {
+                    if(!module.others.active() && !keepDimmed) {
+                      module.hideDimmer();
+                    }
+                    if(settings.keyboardShortcuts) {
+                      module.remove.keyboardShortcuts();
+                    }
+                  },
+                  onComplete : function() {
+                    settings.onHidden.call(element);
+                    module.restore.focus();
+                    callback();
+                  }
+                })
+              ;
+            }
+            else {
+              module.error(error.noTransition);
+            }
+          }
+        },
+
         showDimmer: function() {
-          if( !$dimmable.dimmer('is active') ) {
+          if($dimmable.dimmer('is animating') || !$dimmable.dimmer('is active') ) {
             module.debug('Showing dimmer');
             $dimmable.dimmer('show');
           }
@@ -324,99 +424,61 @@ $.fn.modal = function(parameters) {
           }
         },
 
-        hide: function(callback) {
-          callback = $.isFunction(callback)
-            ? callback
-            : function(){}
-          ;
-          if($allModals.filter(':visible').size() <= 1) {
-            module.hideDimmer();
-          }
-          module.hideModal(callback);
-        },
-
         hideDimmer: function() {
-          if( !($dimmable.dimmer('is active') || $dimmable.dimmer('is animating')) ) {
-            module.debug('Dimmer is not visible cannot hide');
-            return;
-          }
-          module.debug('Hiding dimmer');
-          module.remove.clickaway();
-          $dimmable.dimmer('hide', function() {
-            if(settings.transition && $.fn.transition !== undefined && $module.transition('is supported')) {
+          if( $dimmable.dimmer('is animating') || ($dimmable.dimmer('is active')) ) {
+            $dimmable.dimmer('hide', function() {
+              module.remove.clickaway();
               module.remove.screenHeight();
-            }
-            module.remove.active();
-          });
-        },
-
-        hideModal: function(callback) {
-          callback = $.isFunction(callback)
-            ? callback
-            : function(){}
-          ;
-          module.debug('Hiding modal');
-          $.proxy(settings.onHide, element)();
-          if(settings.transition && $.fn.transition !== undefined && $module.transition('is supported')) {
-            $module
-              .transition({
-                debug      : settings.debug,
-                animation  : settings.transition + ' out',
-                queue      : false,
-                duration   : settings.duration,
-                onStart    : function() {
-                  module.remove.keyboardShortcuts();
-                },
-                onComplete : function() {
-                  $.proxy(settings.onHidden, element)();
-                  module.remove.active();
-                  module.restore.focus();
-                  callback();
-                }
-              })
-            ;
+            });
           }
           else {
-            module.remove.keyboardShortcuts();
-            $module
-              .fadeOut(settings.duration, settings.easing, function() {
-                $.proxy(settings.onHidden, element)();
-                module.remove.active();
-                module.restore.focus();
-                callback();
-              })
-            ;
+            module.debug('Dimmer is not visible cannot hide');
+            return;
           }
         },
 
         hideAll: function(callback) {
+          var
+            $visibleModals = $allModals.filter('.' + className.active + ', .' + className.animating)
+          ;
           callback = $.isFunction(callback)
             ? callback
             : function(){}
           ;
-          if( $allModals.is(':visible') ) {
+          if( $visibleModals.length > 0 ) {
             module.debug('Hiding all visible modals');
             module.hideDimmer();
-            $allModals
-              .filter(':visible')
-                .modal('hide modal', callback)
+            $visibleModals
+              .modal('hide modal', callback)
             ;
           }
         },
 
         hideOthers: function(callback) {
+          var
+            $visibleModals = $otherModals.filter('.' + className.active + ', .' + className.animating)
+          ;
           callback = $.isFunction(callback)
             ? callback
             : function(){}
           ;
-          if( $otherModals.is(':visible') ) {
+          if( $visibleModals.length > 0 ) {
             module.debug('Hiding other modals', $otherModals);
-            $otherModals
-              .filter(':visible')
-                .modal('hide modal', callback)
+            $visibleModals
+              .modal('hide modal', callback, true)
             ;
           }
         },
+
+        others: {
+          active: function() {
+            return ($otherModals.filter('.' + className.active).length > 0);
+          },
+          animating: function() {
+            return ($otherModals.filter('.' + className.animating).length > 0);
+          }
+        },
+
 
         add: {
           keyboardShortcuts: function() {
@@ -429,13 +491,19 @@ $.fn.modal = function(parameters) {
 
         save: {
           focus: function() {
-            $focusedElement = $(document.activeElement).blur();
+            var
+              $activeElement = $(document.activeElement),
+              inCurrentModal = $activeElement.closest($module).length > 0
+            ;
+            if(!inCurrentModal) {
+              $focusedElement = $(document.activeElement).blur();
+            }
           }
         },
 
         restore: {
           focus: function() {
-            if($focusedElement && $focusedElement.size() > 0) {
+            if($focusedElement && $focusedElement.length > 0) {
               $focusedElement.focus();
             }
           }
@@ -446,19 +514,21 @@ $.fn.modal = function(parameters) {
             $module.removeClass(className.active);
           },
           clickaway: function() {
-            if(settings.closable) {
-              $dimmer
-                .off('click' + eventNamespace)
-              ;
+            $dimmer
+              .off('click' + elementEventNamespace)
+            ;
+          },
+          bodyStyle: function() {
+            if($body.attr('style') === '') {
+              module.verbose('Removing style attribute');
+              $body.removeAttr('style');
             }
           },
           screenHeight: function() {
-            if(module.cache.height > module.cache.pageHeight) {
-              module.debug('Removing page height');
-              $body
-                .css('height', '')
-              ;
-            }
+            module.debug('Removing page height');
+            $body
+              .css('height', '')
+            ;
           },
           keyboardShortcuts: function() {
             module.verbose('Removing keyboard shortcuts');
@@ -473,24 +543,41 @@ $.fn.modal = function(parameters) {
         },
 
         cacheSizes: function() {
+          $module.addClass(className.loading);
           var
-            modalHeight = $module.outerHeight()
+            scrollHeight = $module.prop('scrollHeight'),
+            modalHeight  = $module.outerHeight()
           ;
           if(module.cache === undefined || modalHeight !== 0) {
             module.cache = {
               pageHeight    : $(document).outerHeight(),
               height        : modalHeight + settings.offset,
+              scrollHeight  : scrollHeight + settings.offset,
               contextHeight : (settings.context == 'body')
                 ? $(window).height()
-                : $dimmable.height()
+                : $dimmable.height(),
             };
+            module.cache.topOffset = -(module.cache.height / 2);
           }
+          $module.removeClass(className.loading);
           module.debug('Caching modal and container sizes', module.cache);
         },
 
         can: {
           fit: function() {
-            return (module.cache.height < module.cache.contextHeight);
+            var
+              contextHeight  = module.cache.contextHeight,
+              verticalCenter = module.cache.contextHeight / 2,
+              topOffset      = module.cache.topOffset,
+              scrollHeight   = module.cache.scrollHeight,
+              height         = module.cache.height,
+              paddingHeight  = settings.padding,
+              startPosition  = (verticalCenter + topOffset)
+            ;
+            return (scrollHeight > height)
+              ? (startPosition + scrollHeight + paddingHeight < contextHeight)
+              : (height + (paddingHeight * 2) < contextHeight)
+            ;
           }
         },
 
@@ -504,6 +591,9 @@ $.fn.modal = function(parameters) {
               : $module.is(':visible')
             ;
           },
+          scrolling: function() {
+            return $dimmable.hasClass(className.scrolling);
+          },
           modernBrowser: function() {
             // appName for IE11 reports 'Netscape' can no longer use
             return !(window.ActiveXObject || "ActiveXObject" in window);
@@ -512,34 +602,70 @@ $.fn.modal = function(parameters) {
 
         set: {
           autofocus: function() {
-            if(settings.autofocus) {
-              var
-                $inputs    = $module.find(':input:visible'),
-                $autofocus = $inputs.filter('[autofocus]'),
-                $input     = ($autofocus.size() > 0)
-                  ? $autofocus
-                  : $inputs
-              ;
-              $input.first().focus();
+            var
+              $inputs    = $module.find('[tabindex], :input').filter(':visible'),
+              $autofocus = $inputs.filter('[autofocus]'),
+              $input     = ($autofocus.length > 0)
+                ? $autofocus.first()
+                : $inputs.first()
+            ;
+            if($input.length > 0) {
+              $input.focus();
             }
           },
           clickaway: function() {
-            if(settings.closable) {
-              $dimmer
-                .off('click' + eventNamespace)
-                .on('click' + eventNamespace, module.event.click)
-              ;
-            }
+            $dimmer
+              .on('click' + elementEventNamespace, module.event.click)
+            ;
           },
-          screenHeight: function() {
-            if(module.cache.height > module.cache.pageHeight) {
-              module.debug('Modal is taller than page content, resizing page height');
-              $body
-                .css('height', module.cache.height + settings.padding)
+          dimmerSettings: function() {
+            if($.fn.dimmer === undefined) {
+              module.error(error.dimmer);
+              return;
+            }
+            var
+              defaultSettings = {
+                debug      : settings.debug,
+                dimmerName : 'modals',
+                closable   : 'auto',
+                variation  : settings.centered
+                  ? false
+                  : 'top aligned'
+                ,
+                duration   : {
+                  show     : settings.duration,
+                  hide     : settings.duration
+                }
+              },
+              dimmerSettings = $.extend(true, defaultSettings, settings.dimmerSettings)
+            ;
+            if(settings.inverted) {
+              dimmerSettings.variation = (dimmerSettings.variation !== undefined)
+                ? dimmerSettings.variation + ' inverted'
+                : 'inverted'
               ;
+              $dimmer.addClass(className.inverted);
             }
             else {
+              $dimmer.removeClass(className.inverted);
+            }
+            if(settings.blurring) {
+              $dimmable.addClass(className.blurring);
+            }
+            else {
+              $dimmable.removeClass(className.blurring);
+            }
+            $context.dimmer('setting', dimmerSettings);
+          },
+          screenHeight: function() {
+            if( module.can.fit() ) {
               $body.css('height', '');
+            }
+            else {
+              module.debug('Modal is taller than page content, resizing page height');
+              $body
+                .css('height', module.cache.height + (settings.padding * 2) )
+              ;
             }
           },
           active: function() {
@@ -552,31 +678,17 @@ $.fn.modal = function(parameters) {
           type: function() {
             if(module.can.fit()) {
               module.verbose('Modal fits on screen');
-              module.remove.scrolling();
+              if(!module.others.active() && !module.others.animating()) {
+                module.remove.scrolling();
+              }
             }
             else {
               module.verbose('Modal cannot fit on screen setting to scrolling');
               module.set.scrolling();
             }
           },
-          position: function() {
-            module.verbose('Centering modal on page', module.cache);
-            if(module.can.fit()) {
-              $module
-                .css({
-                  top: '',
-                  marginTop: -(module.cache.height / 2)
-                })
-              ;
-            }
-            else {
-              $module
-                .css({
-                  marginTop : '',
-                  top       : $document.scrollTop()
-                })
-              ;
-            }
+          undetached: function() {
+            $dimmable.addClass(className.undetached);
           }
         },
 
@@ -586,7 +698,12 @@ $.fn.modal = function(parameters) {
             $.extend(true, settings, name);
           }
           else if(value !== undefined) {
-            settings[name] = value;
+            if($.isPlainObject(settings[name])) {
+              $.extend(true, settings[name], value);
+            }
+            else {
+              settings[name] = value;
+            }
           }
           else {
             return settings[name];
@@ -604,7 +721,7 @@ $.fn.modal = function(parameters) {
           }
         },
         debug: function() {
-          if(settings.debug) {
+          if(!settings.silent && settings.debug) {
             if(settings.performance) {
               module.performance.log(arguments);
             }
@@ -615,7 +732,7 @@ $.fn.modal = function(parameters) {
           }
         },
         verbose: function() {
-          if(settings.verbose && settings.debug) {
+          if(!settings.silent && settings.verbose && settings.debug) {
             if(settings.performance) {
               module.performance.log(arguments);
             }
@@ -626,8 +743,10 @@ $.fn.modal = function(parameters) {
           }
         },
         error: function() {
-          module.error = Function.prototype.bind.call(console.error, console, settings.name + ':');
-          module.error.apply(console, arguments);
+          if(!settings.silent) {
+            module.error = Function.prototype.bind.call(console.error, console, settings.name + ':');
+            module.error.apply(console, arguments);
+          }
         },
         performance: {
           log: function(message) {
@@ -649,7 +768,7 @@ $.fn.modal = function(parameters) {
               });
             }
             clearTimeout(module.performance.timer);
-            module.performance.timer = setTimeout(module.performance.display, 100);
+            module.performance.timer = setTimeout(module.performance.display, 500);
           },
           display: function() {
             var
@@ -743,7 +862,7 @@ $.fn.modal = function(parameters) {
       }
       else {
         if(instance !== undefined) {
-          module.destroy();
+          instance.invoke('destroy');
         }
         module.initialize();
       }
@@ -758,38 +877,64 @@ $.fn.modal = function(parameters) {
 
 $.fn.modal.settings = {
 
-  name          : 'Modal',
-  namespace     : 'modal',
+  name           : 'Modal',
+  namespace      : 'modal',
 
-  debug         : false,
-  verbose       : true,
-  performance   : true,
+  silent         : false,
+  debug          : false,
+  verbose        : false,
+  performance    : true,
 
-  allowMultiple : false,
-  detachable    : true,
-  closable      : true,
-  autofocus     : true,
+  observeChanges : false,
 
-  context       : 'body',
+  allowMultiple  : false,
+  detachable     : true,
+  closable       : true,
+  autofocus      : true,
 
-  duration      : 500,
-  easing        : 'easeOutExpo',
-  offset        : 0,
-  transition    : 'scale',
+  inverted       : false,
+  blurring       : false,
 
-  padding       : 30,
+  centered       : true,
 
-  onShow        : function(){},
-  onHide        : function(){},
+  dimmerSettings : {
+    closable : false,
+    useCSS   : true
+  },
 
-  onVisible     : function(){},
-  onHidden      : function(){},
+  // whether to use keyboard shortcuts
+  keyboardShortcuts: true,
 
-  onApprove     : function(){ return true; },
-  onDeny        : function(){ return true; },
+  context    : 'body',
+
+  queue      : false,
+  duration   : 500,
+  offset     : 0,
+  transition : 'scale',
+
+  // padding with edge of page
+  padding    : 50,
+
+  // called before show animation
+  onShow     : function(){},
+
+  // called after show animation
+  onVisible  : function(){},
+
+  // called before hide animation
+  onHide     : function(){ return true; },
+
+  // called after hide animation
+  onHidden   : function(){},
+
+  // called after approve selector match
+  onApprove  : function(){ return true; },
+
+  // called after deny selector match
+  onDeny     : function(){ return true; },
 
   selector    : {
-    close    : '.close, .actions .button',
+    close    : '> .close',
     approve  : '.actions .positive, .actions .approve, .actions .ok',
     deny     : '.actions .negative, .actions .deny, .actions .cancel',
     modal    : '.ui.modal'
@@ -800,10 +945,15 @@ $.fn.modal.settings = {
     notFound  : 'The element you specified could not be found'
   },
   className : {
-    active    : 'active',
-    scrolling : 'scrolling'
+    active     : 'active',
+    animating  : 'animating',
+    blurring   : 'blurring',
+    inverted   : 'inverted',
+    loading    : 'loading',
+    scrolling  : 'scrolling',
+    undetached : 'undetached'
   }
 };
 
 
-})( jQuery, window , document );
+})( jQuery, window, document );

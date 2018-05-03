@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pediction</title>
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" async
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/x-mathjax-config">
+         MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+</head>
+<body>
+<div class="ui grid" id="nav">
+    <div class="six wide column">
+        <a style="color: white;" href="index.html"><h1>Components simulation</h1></a>
+    </div>
+    <div class="ten wide column">
+        <div class="ui four item inverted menu">
+            <a class="item" href="scheduling.html">Scheduling</a>
+            <a class="item active" href="prediction.html">Prediction</a>
+            <a class="item" href="interblocage.html">Deadlock</a>
+            <a class="item" href="producteur_consommateur.html">Producer - Consumer</a>
+        </div>
+    </div>
+</div>
+
+<div class="ui centered grid">
+    <div class="six wide column">
+        <div class="ui one column centered grid">
+            <div class="row bordered_container">
+                <div class="ui column">
+                    <h3 class="ui horizontal divider header">
+                        <i class="calculator icon"></i>
+                        Prediction calculator
+                    </h3>
+                    <div class="ui one column grid" style="margin: 0.5em;">
+                        <div class="row">
+                            <p class="formula width100">
+                                $$\tau_{n+1} = \alpha \cdot t_n + (1 - \alpha) \cdot \tau_n$$
+                            </p>
+                        </div>
+
+                        <div class="row">
+                            <div class="ui form width100">
+                                <div class="fields">
+                                    <div id="div_alpha" class="field width100"
+                                         data-tooltip="0 ≤ α ≤ 1">
+                                        <label>$$\alpha$$</label>
+                                        <input type="number" placeholder="α" min="0" max="1" id="alpha"/>
+                                    </div>
+                                    <div id="div_tau" class="field width100" data-tooltip="Previous prediction">
+                                        <label>$$\tau_n$$</label>
+                                        <input type="number" placeholder="Tau" id="tau"/>
+                                    </div>
+                                    <div id="div_tn" class="field width100"
+                                         data-tooltip="Actual burst size">
+                                        <label>$$t_n$$</label>
+                                        <input type="number" placeholder="tn" id="tn"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="width100">
+                                <button class="ui button width100" id="btn_calculate">Calculate</button>
+                            </div>
+                        </div>
+                        <div class="row centered ui center aligned big green label" id="result">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="container">
+    <div id="foot">
+        <p>By Axel Rieben & Sylvain Renaud - 2018 - OS Conception</p>
+    </div>
+</footer>
+
+</body>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="semantic/dist/semantic.min.js"></script>
+<script src="semantic/dist/components/dropdown.min.js"></script>
+<script src="js/prediction/main.js"></script>
+<script src="js/init_dropdown.js"></script>
+</html>

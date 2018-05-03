@@ -3,8 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <title>Scheduling</title>
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
-<body>
+<body onload="init()">
+<div class="ui grid" id="nav">
+    <div class="six wide column">
+        <a style="color: white;" href="index.html"><h1>Components simulation</h1></a>
+    </div>
+    <div class="ten wide column">
+        <div class="ui four item inverted menu">
+            <a class="item active" href="scheduling.html">Scheduling</a>
+            <a class="item" href="prediction.html">Prediction</a>
+            <a class="item" href="interblocage.html">Deadlock</a>
+            <a class="item" href="producteur_consommateur.html">Producer - Consumer</a>
+        </div>
+    </div>
+</div>
+<div class="ui centered grid">
+    <div class="six wide column">
+        <div class="ui one column centered grid">
+            <div class="row bordered_container" id="div_inputs">
+                <div class="ui column">
+                    <h3 class="ui horizontal divider header">
+                        <i class="code icon"></i>
+                        Scheduling algorithm
+                    </h3>
+                    <div class="field">
+                        <select class="ui fluid dropdown" id="select_algo" title="algorithm">
+                            <option value="fcfs">First-Come, First-Served</option>
+                            <option value="sjf_np">Shortest-Job-First Non-Préemptif</option>
+                            <option value="sjf_p">Shortest-Job-First Préemptif</option>
+                            <option value="rr">Round Robin</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <div id="div_quantum" class="ui input fluid"
+                             data-tooltip="Quantum parameter for Round Robin algorithm"
+                             data-position="bottom center">
+                            <input class="ui input " type="number" id="quantum" min="1" max="30" value="5"/>
+                        </div>
+                    </div>
+                    <h3 class="ui horizontal divider header">
+                        <i class="bolt icon"></i>
+                        Process
+                    </h3>
+
+                    <div class="ui centered grid" id="form_process">
+                        <div class="six wide column">
+                            <div class="ui input width100" data-tooltip="Arriving time" data-position="top center">
+                                <input class="ui input width100" type="number" id="in_arrival" min="0" max="40"
+                                       placeholder="Arriving time"/>
+                            </div>
+                        </div>
+                        <div class="six wide column">
+                            <div class="ui input width100" data-tooltip="Duration" data-position="top center">
+                                <input class="width100" type="number" id="in_duration" min="1" max="15"
+                                       placeholder="Duration"/>
+                            </div>
+                        </div>
+                        <div class="four wide column" id="div_btn_add_process">
+                            <button class="ui button width100" id="btn_add_process">Add</button>
+                        </div>
+
+                    </div>
+                    <div class="ui grid">
+                        <div class="row">
+                            <div class="eight wide column">
+                                <button class="ui button width100" id="btn_add_random">Add random process</button>
+                            </div>
+                            <div class="eight wide column">
+                                <button class="ui button width100" id="btn_reset">Reset</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="eight wide column">
+                                <button class="ui button width100" id="btn_test_data">Load test data</button>
+                            </div>
+                            <div class="eight wide column">
+                                <button class="ui button width100" onclick="print()">Print</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="ui celled table" id="processes_table">
+                        <thead>
+                        <tr>
+                            <th class="center aligned">Name</th>
+                            <th class="center aligned">Arriving time</th>
+                            <th class="center aligned">Duration</th>
+                        </tr>
+                        </thead>
+                        <tbody id="processes_table_body">
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="bordered_container" id="div_execution">
+        <h3 class="ui horizontal divider header">
+            <i class="play icon"></i>
+            Execution
+        </h3>
+        <div class="ui centered grid">
+            <div class="row">
+                <div class="ui buttons">
+                    <button class="ui button" id="btn_manual">Manual</button>
+                    <div class="or" data-text="or"></div>
+                    <button class="ui positive button" id="btn_auto">Automatic</button>
+                </div>
+            </div>
+            <div class="row">
+                <button id="btn_next" class="ui right labeled icon button disabled" disabled>
+                    <i class="right arrow icon"></i>
+                    Next
+                </button>
+                <button id="btn_stats" class="ui right labeled icon button">
+                    <i class="chart bar outline icon"></i>
+                    Statistics
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="column" id="middle_col"></div>
+    <div class="eight wide column" id="right_side">
+        <div class="bordered_container" id="div_stats" hidden>
+            <h3 class="ui horizontal divider header">
+                <i class="chart bar outline icon"></i>
+                Statistics
+            </h3>
+            <div id="div_stats_content">
+
+            </div>
+        </div>
+
+        <div class="bordered_container" id="div_result" hidden>
+            <h3 class="ui horizontal divider header">
+                <i class="calendar alternate outline icon"></i>
+                Results
+            </h3>
+            <table class="ui celled definition table" id="execution_table">
+                <thead>
+                <tr id="execution_table_head"></tr>
+                </thead>
+                <tbody id="execution_table_body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer class="container">
+    <div id="foot">
+        <p>By Axel Rieben & Sylvain Renaud - 2018 - OS Conception</p>
+    </div>
+</footer>
 
 </body>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="semantic/dist/semantic.min.js"></script>
+<script src="semantic/dist/components/dropdown.min.js"></script>
+<script src="js/scheduling/main.js"></script>
+<script src="js/init_dropdown.js"></script>
 </html>

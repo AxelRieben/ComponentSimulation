@@ -3,22 +3,33 @@
     <head>
         <title>Simulation ...</title>
         <meta charset="UTF-8">
-		<style>
-			canvas {border :1px black solid;
-			padding-left: 0;
-			padding-right: 0;
-			margin-left: auto;
-			margin-right: auto;
-			display: block;}	
-		</style>	
+		<link rel="stylesheet" type="text/css" href="css/component.css">	
     </head>
     <body>
         <div id="head" style="text-align:center; border-bottom: solid 2px black;">
-            <h1>Simulation De composant OS</h1>
-            <h2>Simulation de ....</h2>
+            <h1>Simulation de composant OS</h1>
+            <h2>Simulation producteur consommateur.</h2>
         </div>
-		<div id="container"></div>
-
+        <div id=englobing>
+        	<div id="container1"></div>
+			<div id="container2"></div>
+			<div id="container3">
+				<textarea readonly id="console"></textarea>
+			</div>
+		</div>
+		<div id="synchronisedDiv">
+			<label> Not synchronised</label>
+				<label class="switch">
+					<input type="checkbox" id="synchronisedBox" onchange="updateRangeValue(this.value,'null')">
+					<span class="slide"></span>
+				</label>
+			<label> Synchronised</label>
+		</div></br>
+		<div class="slidecontainer">
+			<label for="numberOfArc">Nombre d'arc : </label><input type="range" min="4" max="12" value="8" class="slider" id="numberOfArc" onchange="updateRangeValue(this.value,'displayNumberOfArc')"><input type="number" id="displayNumberOfArc" value="8" disabled="disabled"></input></br>
+			<label for="writeTimer">Délai d'écriture(ms): </label><input type="range" min="100" max="1500" value="500" class="slider" id="writeTimer" step="100" onchange="updateRangeValue(this.value,'displayWriteTimer')"><input type="number" id="displayWriteTimer" value="500" disabled="disabled"></input></br>
+			<label for="readTimer">Délai de lecture(ms): </label><input type="range" min="100" max="1500" value="700" class="slider" id="readTimer" step="100" onchange="updateRangeValue(this.value,'displayReadTimer')"><input type="number" id="displayReadTimer" value="700" disabled="disabled"></input></br>
+		</div>
 		<footer style="margin-top:100px; border-top:2px solid black; ">
             <h4>Contextualisation</h4>
             Simulations réalisée durant le cours de conceptions os par Axel Rieben , Pedro Emmanuel Da Cruz Costa, Syslvain Renaud et Killian Castella

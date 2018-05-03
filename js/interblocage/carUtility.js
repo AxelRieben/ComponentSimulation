@@ -161,18 +161,18 @@ function manageLightsTraffic(){
                 lightStopLeftRight();
                 setTimeout(function(){
                     lightStartTopBottom();
+                    $('#trafficStatusTopBottom').html("Green for Top and Bottom");
+                    $('#trafficStatusTopBottom').css("color","green");
                 },3000);
                 $('#trafficStatusLeftRight').html("Red for Left and Right");
                 $('#trafficStatusLeftRight').css("color","red");
-                $('#trafficStatusTopBottom').html("Green for Top and Bottom");
-                $('#trafficStatusTopBottom').css("color","green");
             }else{
                 lightStopTopBottom();
                 setTimeout(function(){
-                    lightStartLeftRight()
+                    lightStartLeftRight();
+                    $('#trafficStatusLeftRight').html("Green for Left and Right");
+                    $('#trafficStatusLeftRight').css("color","green");
                 },3000);
-                $('#trafficStatusLeftRight').html("Green for Left and Right");
-                $('#trafficStatusLeftRight').css("color","green");
                 $('#trafficStatusTopBottom').html("Red for Top and Bottom");
                 $('#trafficStatusTopBottom').css("color","red");
             }

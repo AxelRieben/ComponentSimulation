@@ -6,14 +6,14 @@ var groundMarkBottom = null;
 function roads() {
     var rect1 = new Konva.Rect({
         x: 0,
-        y: stage.getHeight()/2 - size/2,
+        y: stage.getHeight() / 2 - size / 2,
         width: stage.getWidth(),
         height: size,
         fill: 'gray'
     });
 
     var rect2 = new Konva.Rect({
-        x: stage.getWidth()/2 - size/2,
+        x: stage.getWidth() / 2 - size / 2,
         y: 0,
         width: size,
         height: stage.getHeight(),
@@ -21,7 +21,7 @@ function roads() {
     });
 
     var dotLine = new Konva.Line({
-        points: [0, stage.getHeight()/2, stage.getWidth(), stage.getHeight()/2],
+        points: [0, stage.getHeight() / 2, stage.getWidth(), stage.getHeight() / 2],
         stroke: 'white',
         strokeWidth: 2,
         lineJoin: 'round',
@@ -29,7 +29,7 @@ function roads() {
     });
 
     var dotLine2 = new Konva.Line({
-        points: [stage.getWidth()/2, 0, stage.getWidth()/2, stage.getHeight()],
+        points: [stage.getWidth() / 2, 0, stage.getWidth() / 2, stage.getHeight()],
         stroke: 'white',
         strokeWidth: 2,
         lineJoin: 'round',
@@ -69,7 +69,7 @@ function groundMarks() {
         'js/interblocage/static/marquage_sol_2_top_and_bottom.png');
 }
 
-function groundMark(_x,_y,_width,_height, imageSource){
+function groundMark(_x, _y, _width, _height, imageSource) {
 
     let groundMarkImage = new Image();
 

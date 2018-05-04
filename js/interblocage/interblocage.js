@@ -17,17 +17,17 @@ var isStarted = false;
 roads();
 groundMarks();
 
-function callCars(){
-    if (isStarted === false){
+function callCars() {
+    if (isStarted === false) {
         startTimer();
         isStarted = true;
     }
 }
 
 function stopCars() {
-    if (isStarted === true){
+    if (isStarted === true) {
         $("#toggle_input").removeAttr('disabled');
-        listCar.forEach(function(car) {
+        listCar.forEach(function (car) {
             car.stopAnimation();
             car.rect.destroy();
         });
@@ -51,10 +51,11 @@ function fitStageIntoParentContainer() {
 
     stage.width(stageWidth * scale);
     stage.height(stageHeight * scale);
-    stage.scale({ x: scale, y: scale });
+    stage.scale({x: scale, y: scale});
 
     stage.draw();
 }
+
 fitStageIntoParentContainer();
 // adapt the stage on any window resize
 window.addEventListener('resize', fitStageIntoParentContainer);
